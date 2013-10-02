@@ -3,13 +3,14 @@
 
 // models/new GET
 function get_new(req, res){
-	res.send("render form for new model3d");
+	console.log("trying to render");
+	res.render('models/new');
 }
 
 // models/new POST
 function post_new(req, res){
 	console.log("creating new model?")
-	res.send("render form for new model3d");
+	res.send("created new model. Thanks");
 }
 
 // models/:id GET
