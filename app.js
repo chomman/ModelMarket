@@ -2,6 +2,7 @@ var url = require('url');
 //#express
 var express = require('express');
 var app = express();
+app.use(express.bodyParser());
 
 // # Controllers:
 // 	This is where the model schemas are defined
@@ -30,7 +31,7 @@ db.once('open', function callback () {
 });
 app.all('*', function(request, response, next)
     {
-    request.database = db;
+    request.mongoose = mongoose;
     next();
 });
 //------------------------------------------
@@ -39,12 +40,13 @@ app.all('*', function(request, response, next)
 app.use(express.static(__dirname + '/public'))
 app.use(express.cookieParser());
 app.use(express.session({secret: 'IMMABEAST'}));
+
 //--------------------------------
 
 // #Routes
 app.get('/models/new', models_controller.get_new);
 app.post('/models/new', models_controller.post_new);
 app.get('/models/:id', models_controller.show);
-app.del('models/:id', models_controller.del);
+app.del('/models/:id', models_controller.del);
 
 app.listen(process.env.PORT || 3000);
