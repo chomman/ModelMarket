@@ -1,6 +1,12 @@
+{
+"name" : "modelbazaar",
+"version" : "0.0.1",
+
 "dependencies": {
-  "express": "*",
-  "jade": "*",
-  "mongoose": "*",
-  "url": "*"
+  "express": "",
+  "jade": "",
+  "mongoose": "",
+  "url": ""
+}
+
 }
