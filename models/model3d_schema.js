@@ -9,7 +9,7 @@ var modelSchema = new mongoose.Schema({
     type: String,
     index: false
   },
-  price_USD: {
+  price: {
     type: Number,
     index: true
   },
@@ -25,8 +25,25 @@ var modelSchema = new mongoose.Schema({
   }
 });
 
-var Item = mongoose.model('Model3d', modelSchema);
+var db_model = mongoose.model('Model3d', modelSchema);
 
 module.exports = {
-  model: Item
+  model: db_model
 }
+module.exports.find_by_name = function(name, callback){
+  db_model.findOne({name : name}, function(err,obj) {
+    if(err) callback(null ,err);
+    else callback(obj);
+  });
+};
+
+module.exports.find_by_id = function(id, callback){
+  db_model.findOne({_id : id}, function(err,obj) {
+    if(err) callback(null ,err);
+    else callback(obj);
+  });
+};
+
+module.exports.create = function(obj, callback){
+  
+};

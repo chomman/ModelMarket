@@ -3,11 +3,12 @@ block content
   p
     | Please fill out the following fields before uplaoding your model
   div
-    form(action='new',method='post')
+    form(action='new',method='post', enctype="multipart/form-data")
       div(data-role='fieldcontain')
         label(for='name') Title: 
            input(id='title',type='text',value='',placeholder='My Sexy Model', name="name")
       div(data-role='fieldcontain')
         label(for='description') Description: 
           input(id='description',type='text',value='',placeholder='This is my sexy model, it is very nice', name='description')
+      input(type="file", name="model")
       input(type='submit',value='Submit',data-transition='fade', data-theme='c')

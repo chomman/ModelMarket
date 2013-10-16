@@ -1,0 +1,11 @@
+extend ../layout
+block content
+  p
+    | You are about to purchase #{name}. #{description}. The price of this model is #{price} USD.
+
+  p 
+    | Purchase stuff will go here. For now, click below to confirm.
+  div
+    form(action='buy',method='post')
+      input(type='hidden', value='#{id}')
+      input(type='submit',value='Finish',data-transition='fade', data-theme='c')
