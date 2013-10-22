@@ -12,6 +12,9 @@ var modelSchema = new mongoose.Schema({
     index: false
   },
   price: {
+    type: Number
+  },
+  views: {
     type: Number,
     index: true
   },
