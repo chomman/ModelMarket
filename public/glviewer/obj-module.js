@@ -1,4 +1,3 @@
-
 var gl;
 var scene;
 var xoff = -2;
@@ -17,7 +16,7 @@ var zoom = -8;
 
 function initGL(canvas) {
     try {
-        gl = canvas.getContext("experimental-webgl");
+        gl = canvas.getContext("webgl");
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
     } catch (e) {
@@ -72,7 +71,7 @@ function initTexture() {
         handleLoadedTexture(modelTexture);
         modelTextureLoaded = true;
     }
-    modelTexture.image.src = "assets/uffizi_probe.png";
+    modelTexture.image.src = "/uploads/uffizi_probe.png";
 
     modelTexture2 = gl.createTexture();
     modelTexture2.image = new Image();
@@ -80,7 +79,7 @@ function initTexture() {
         handleLoadedTexture(modelTexture2);
         modelTexture2Loaded = true;
     }
-    modelTexture2.image.src = "assets/sand.gif";
+    modelTexture2.image.src = "/uploads/sand.gif";
 }
 
 function handleLoadedTexture(texture) {
@@ -208,14 +207,6 @@ function initBuffers() {
 
 
 
-
-
-
-
-
-
-
-
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -306,14 +297,14 @@ function customInvert43(matrix){
 
 function webGLStart() {
     var canvas = document.getElementById("my-canvas");
-    canvas.width = $(window).width(); 
-    canvas.height = $(window).height()*.9; 
+    //canvas.width = $(window).width(); 
+    //canvas.height = $(window).height()*.9; 
     initGL(canvas);
     initShaders();
     initBuffers();
     initScene();
     initTexture();
-    getModelFromFile("teapot.obj");
+    getModelFromFile(modelURL);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -336,19 +327,6 @@ var timeNow = new Date().getTime();
     }
     lastTime = timeNow;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 var modelVertexPositionBuffer;
@@ -500,7 +478,7 @@ function finishedModelDownload(data){
     //drawScene();
 }
 function getModelFromFile(modelURL){
-    $.get("models/" + modelURL, finishedModelDownload, 'text')
+    $.get(modelURL, finishedModelDownload, 'text')
 }
 
 function face(_v1, _v2, _v3){

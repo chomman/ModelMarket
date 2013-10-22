@@ -1,7 +1,7 @@
 // Models Controller
 // * * * * * * * * * * 
-var fs = require('fs');
 var Model3d = require('./../models/model3d_schema');
+var File = require('./../models/file_schema');
 
 // models/new GET
 function get_new(req, res){
@@ -11,32 +11,59 @@ function get_new(req, res){
 // models/new POST
 function post_new(req, res){
     console.log(req.body);
-    var new_model3d = new Model3d.model(
-        {name : req.body.name || "undefined",
-         description: req.body.description || "no description"
-        });
-    new_model3d.save(function (err) {
-      if (err) // ...
-      console.log('error saving model!');
-    });
-    console.log("creating and saved new model3d with id: " + new_model3d._id);
-    console.log(req.files);
-    fs.readFile(req.files.model.path, function (err, data) {
-      if(err) console.log(err);
-      var newPath = __dirname + "/../uploads/" + new_model3d._id + ".obj";
-      console.log(newPath);
-      fs.writeFile(newPath, data, function (err) {
-        res.send("created new model. Thanks");
-      });
+    console.log(req.files.model.path);
+
+    var new_model3d = new Model3d.model({name : req.body.name || "undefined"
+                                        ,description: req.body.description || "no description"
+                                        ,rice: 5.00
+                                        });
+
+    var new_file = new File.model({owner: new_model3d.id});
+
+    /*  This shit shoud probably be done in the file_schema module */
+
+    var obj_file_name = new_model3d.id + "_" + new_file.id + ".obj"
+    var obj_file_type = "OBJ"
+
+    new_file.location = obj_file_name;
+    new_file.type = obj_file_type;
+
+    
+
+    File.move(req.files.model.path, obj_file_name, function(err){
+        if(err)
+        {
+            console.log("There was an error moving the file to uploads");
+            console.log(err);
+        }
+        else console.log("File saved!");
     });
 
+    new_model3d.save(function (err, product, numberAffected) {
+        if(err) console.log("There was an error saving the model3d to the db! \n" + err);
+    });
+    new_file.save(function (err, product, numberAffected) {
+        if(err) console.log("There was an error saving the file to the db! \n" + err);
+    });
+
+    console.log("new model id: " + new_model3d.id);
+    res.redirect("models/"+new_model3d.id);
 }
 
 // models/:id GET
 function get_show(req, res){
-    Model3d.find_by_id(req.params.id, function(obj, err){
+    Model3d.find_by_id(req.params.id, function(model_obj, err){
         if(err) res.render('something_broke :(');
-        else res.render('models/show', {name: obj.name, description: obj.description});
+        else
+        {
+            var parent_id = model_obj.id;
+            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
+            {
+                console.log("yo: " + file_obj_array);
+                console.log(file_obj_array);
+                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description});
+            });
+        } 
     });
 }
 

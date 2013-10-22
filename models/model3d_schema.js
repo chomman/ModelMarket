@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 
+var File = require('./file_schema');
+
 var modelSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -13,14 +15,14 @@ var modelSchema = new mongoose.Schema({
     type: Number,
     index: true
   },
-  owner: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     index: true
   },
   owners: Array,
   favorites: Array,
-  location: {
-    type: String,
+  upload: {
+    type: mongoose.Schema.Types.ObjectId,
     index: false
   }
 });
@@ -44,6 +46,16 @@ module.exports.find_by_id = function(id, callback){
   });
 };
 
-module.exports.create = function(obj, callback){
-  
+module.exports.create = function(hash, filelocation, callback){
+  var new_model3d = new db_model(hash);
+  new_model3d.save(function (err) {
+    if (err) { callback(null,err); return;}
+    console.log("no error saving model");
+    File.create({owner: new_model3d._id}, filelocation, function(err, obj){
+      if(err) { callback(null,err); return;}
+      console.log("no error creating file") 
+      new_model3d.upload = obj._id;
+      callback(null,new_model3d);
+    });
+  });
 };

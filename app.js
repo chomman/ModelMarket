@@ -29,6 +29,10 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
   console.log("mongo open");
 });
+
+global.root_path = __dirname;
+console.log(global.root_path);
+
 app.all('*', function(request, response, next)
     {
     request.mongoose = mongoose;
@@ -50,6 +54,5 @@ app.get('/models/:id', models_controller.show);
 app.del('/models/:id', models_controller.del);
 app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
-
 
 app.listen(process.env.PORT || 3000);
