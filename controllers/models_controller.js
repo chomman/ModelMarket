@@ -52,7 +52,7 @@ function post_new(req, res){
 
 // models/:id GET
 function get_show(req, res){
-    Model3d.find_by_id(req.params.id, function(model_obj, err){
+    Model3d.find_by_id(req.params.id, function(err, model_obj){
         if(err) res.render('something_broke :(');
         else
         {
@@ -61,7 +61,7 @@ function get_show(req, res){
             {
                 console.log("yo: " + file_obj_array);
                 console.log(file_obj_array);
-                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description});
+                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price});
             });
         } 
     });

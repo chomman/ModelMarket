@@ -7,6 +7,8 @@ app.use(express.bodyParser());
 // # Controllers:
 // 	This is where the model schemas are defined
 var models_controller = require('./controllers/models_controller');
+var navigation_controller = require('./controllers/navigation_controller');
+
 // -----------------------
 
 // # Models:
@@ -22,7 +24,7 @@ app.set('view engine', 'jade')
 // #DB# :
 // 	Set Up Data Base and pass it to all routes
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/mmdb');
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -48,6 +50,7 @@ app.use(express.session({secret: 'IMMABEAST'}));
 //--------------------------------
 
 // #Routes
+app.get('/', navigation_controller.get_home);
 app.get('/models/new', models_controller.get_new);
 app.post('/models/new', models_controller.post_new);
 app.get('/models/:id', models_controller.show);
