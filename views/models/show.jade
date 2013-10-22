@@ -13,9 +13,6 @@ block content
     varying vec3 vPosition;
     varying vec3 vNormal;
 
-    uniform sampler2D uSampler;
-    uniform sampler2D uSampler2;
-
     uniform vec3 lightPosition;
 
     uniform vec3 uAmbientColor;
@@ -24,8 +21,7 @@ block content
     void main(void) {
         vec3 defaultLight = vec3(.8,.8,.8);
         vec3 lightIntensity;
-        vec4 roughTextureColor = texture2D(uSampler2, vec2(vTextureCoord.s, vTextureCoord.t));
-        vec4 reflectTextureColor = texture2D(uSampler, vec2(vReflectiveTextureCoord.s, vReflectiveTextureCoord.t));
+        vec4 roughTextureColor = vec4(1,1,1,1);
         vec3 textureTotals = vec3( 0.5, 0.5, 0.5);
 
         vec3 eyeDirection = normalize(-vPosition);

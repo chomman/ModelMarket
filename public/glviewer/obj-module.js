@@ -62,26 +62,6 @@ function initGL(canvas) {
     return shader;
 }
 
-var modelTexture;
-var modelTexture2;
-function initTexture() {
-    modelTexture = gl.createTexture();
-    modelTexture.image = new Image();
-    modelTexture.image.onload = function() {
-        handleLoadedTexture(modelTexture);
-        modelTextureLoaded = true;
-    }
-    modelTexture.image.src = "/uploads/uffizi_probe.png";
-
-    modelTexture2 = gl.createTexture();
-    modelTexture2.image = new Image();
-    modelTexture2.image.onload = function() {
-        handleLoadedTexture(modelTexture2);
-        modelTexture2Loaded = true;
-    }
-    modelTexture2.image.src = "/uploads/sand.gif";
-}
-
 function handleLoadedTexture(texture) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -122,8 +102,6 @@ function initShaders() {
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-    shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-    shaderProgram.samplerUniform2 = gl.getUniformLocation(shaderProgram, "uSampler2");
     shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
     shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
     shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
@@ -218,7 +196,7 @@ function drawScene() {
     mat4.translate(mvMatrix, mvMatrix, [0, 0.0, zoom]);
 
 
-    if(modelLoaded && modelTextureLoaded && modelTexture2Loaded){
+    if(modelLoaded){
         mvPushMatrix();
         mat4.translate(mvMatrix, mvMatrix, [0, -1.5, 0.0]);
         mat4.rotate(mvMatrix, mvMatrix, 0.3*Math.sin(xoff), [1.0, 0.0, 0.0]);
@@ -239,14 +217,14 @@ function drawScene() {
         gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureBuffer);
         gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, modelVertexTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        //Textures
+        /*//Textures
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, modelTexture);
         gl.uniform1i(shaderProgram.samplerUniform, 0);
 
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, modelTexture2);
-        gl.uniform1i(shaderProgram.samplerUniform2, 1);
+        gl.uniform1i(shaderProgram.samplerUniform2, 1);*/
 
         //Lighting
         gl.uniform3f(
@@ -303,7 +281,7 @@ function webGLStart() {
     initShaders();
     initBuffers();
     initScene();
-    initTexture();
+    //initTexture();
     getModelFromFile(modelURL);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -530,7 +508,7 @@ function render(a){
     initShaders();
     initBuffers();
     initScene();
-    initTexture();
+    //initTexture();
     modelLoaded = false;
     getModelFromFile(filename);
 }
