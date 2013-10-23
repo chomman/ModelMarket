@@ -56,7 +56,7 @@ function get_show(req, res){
         if(err) res.render('something_broke :(');
         else
         {
-            var parent_id = model_obj.id;
+            var parent_id = model_obj._id;
             File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
             {
                 console.log("yo: " + file_obj_array);

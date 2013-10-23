@@ -1,6 +1,6 @@
 var gl;
 var scene;
-var xoff = -2;
+var xoff = 0;
 var mvMatrixStack = [];
 
 var triangleVertexPositionBuffer;
@@ -70,7 +70,6 @@ function handleLoadedTexture(texture) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.bindTexture(gl.TEXTURE_2D, null);
-    
 }
 
 var shaderProgram;
@@ -125,65 +124,6 @@ function setMatrixUniforms() {
     gl.uniformMatrix3fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 }
 
-var pyramidVertexPositionBuffer;
-var pyramidVertexColorBuffer;
-function initBuffers() {
-    pyramidVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexPositionBuffer);
-    var vertices = [
-        // Front face
-         0.0,  1.0,  0.0,
-        -1.0, -1.0,  1.0,
-         1.0, -1.0,  1.0,
-
-        // Right face
-         0.0,  1.0,  0.0,
-         1.0, -1.0,  1.0,
-         1.0, -1.0, -1.0,
-
-        // Back face
-         0.0,  1.0,  0.0,
-         1.0, -1.0, -1.0,
-        -1.0, -1.0, -1.0,
-
-        // Left face
-         0.0,  1.0,  0.0,
-        -1.0, -1.0, -1.0,
-        -1.0, -1.0,  1.0
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    pyramidVertexPositionBuffer.itemSize = 3;
-    pyramidVertexPositionBuffer.numItems = 12;
-
-    pyramidVertexColorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, pyramidVertexColorBuffer);
-    var colors = [
-        // Front face
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-
-        // Right face
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-
-        // Back face
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-
-        // Left face
-        1.0, 0.0, 0.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        0.0, 1.0, 0.0, 1.0
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-    pyramidVertexColorBuffer.itemSize = 4;
-    pyramidVertexColorBuffer.numItems = 12;
-}
-
-
 
 function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -198,7 +138,7 @@ function drawScene() {
 
     if(modelLoaded){
         mvPushMatrix();
-        mat4.translate(mvMatrix, mvMatrix, [0, -1.5, 0.0]);
+        mat4.translate(mvMatrix, mvMatrix, [0, 0, 0.0]);
         mat4.rotate(mvMatrix, mvMatrix, 0.3*Math.sin(xoff), [1.0, 0.0, 0.0]);
         mat4.rotate(mvMatrix, mvMatrix, 0.4*Math.cos(2*xoff), [0.0, 0.0, 1.0]);
         mat4.rotate(mvMatrix, mvMatrix, xoff, [0.0, 1.0, 0.0]);
@@ -279,8 +219,9 @@ function webGLStart() {
     //canvas.height = $(window).height()*.9; 
     initGL(canvas);
     initShaders();
-    initBuffers();
+    //initBuffers();
     initScene();
+    initMouseGestures();
     //initTexture();
     getModelFromFile(modelURL);
 
@@ -288,6 +229,34 @@ function webGLStart() {
     gl.enable(gl.DEPTH_TEST);
 
     tick();
+}
+function initMouseGestures() {
+    var mousedown = false;
+    var canvas = $('#my-canvas');
+    var coord = {x:0, y:0};
+    console.log(canvas);
+    canvas.mousedown(function(event){
+        console.log(event);
+        mousedown = true;
+        coord.x = event.offsetX;
+        coord.y = event.offsetY;
+    });
+    canvas.mouseup(function(){
+        mousedown = false;
+    });
+    canvas.mouseout(function(){
+        mousedown = false;
+    });
+    canvas.mousemove(function(event){
+        console.log(mousedown);
+        if(mousedown){
+            var ydiff = event.offsetY - coord.y;
+            coord.y = event.offsetY;
+            zoom += .1*ydiff;   
+            console.log("doing this");    
+        }
+
+    });
 }
 function tick(){
     animate();
