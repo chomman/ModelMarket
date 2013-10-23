@@ -52,17 +52,21 @@ function post_new(req, res){
 
 // models/:id GET
 function get_show(req, res){
-    Model3d.find_by_id(req.params.id, function(err, model_obj){
+    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
         if(err) res.render('something_broke :(');
         else
         {
+            console.log(model_obj);
+            console.log("something: " + model_obj.price);
+            model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
             File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
             {
                 console.log("yo: " + file_obj_array);
                 console.log(file_obj_array);
-                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price});
+                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price, views: model_obj.views});
             });
+            model_obj.save();
         } 
     });
 }

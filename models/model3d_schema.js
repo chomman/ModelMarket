@@ -16,7 +16,8 @@ var modelSchema = new mongoose.Schema({
   },
   views: {
     type: Number,
-    index: true
+    required: true,
+    default: 0
   },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
