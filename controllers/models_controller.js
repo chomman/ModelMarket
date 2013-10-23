@@ -15,7 +15,7 @@ function post_new(req, res){
 
     var new_model3d = new Model3d.model({name : req.body.name || "undefined"
                                         ,description: req.body.description || "no description"
-                                        ,rice: 5.00
+                                        ,price: 5.00
                                         });
 
     var new_file = new File.model({owner: new_model3d.id});

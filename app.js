@@ -5,9 +5,10 @@ var app = express();
 app.use(express.bodyParser());
 
 // # Controllers:
-// 	This is where the model schemas are defined
+// 	This is where the controllers are defined
 var models_controller = require('./controllers/models_controller');
 var navigation_controller = require('./controllers/navigation_controller');
+var authentication_controller = require('./controllers/authentication_controller');
 
 // -----------------------
 

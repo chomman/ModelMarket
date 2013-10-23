@@ -1,11 +1,14 @@
 {
-"name" : "modelbazaar",
-"version" : "0.0.1",
+  "name" : "modelbazaar",
+  "version" : "0.0.1",
 
-"dependencies": {
-  "express": "",
-  "jade": "",
-  "mongoose": "",
-  "url": ""
-}
+  "dependencies": {
+    "express": "",
+    "jade": "",
+    "mongoose": "",
+    "url": "",
+    "passport": "",
+    "passport-local": "",
+    "passport-local-mongoose": ""
+  }
 }

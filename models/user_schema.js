@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var passportLocalMongoose = require('passport-local-mongoose');
 
 var userSchema = new mongoose.Schema({
   name: {
@@ -26,8 +27,8 @@ var userSchema = new mongoose.Schema({
   favorites: Array
 });
 
-var Item = mongoose.model('User', userSchema);
+userSchema.plugin(passportLocalMongoose);
 
-module.exports = {
-  model: Item
-}
+var db_model = mongoose.model('User', userSchema);
+
+module.exports = db_model
