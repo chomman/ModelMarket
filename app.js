@@ -59,4 +59,11 @@ app.del('/models/:id', models_controller.del);
 app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
 
+app.get('/logout', authentication_controller.get_logout);
+app.get('/login', authentication_controller.get_login);
+app.get('/register', authentication_controller.get_register);
+
+app.post('/login', authentication_controller.post_register);
+app.post('/register', authentication_controller.post_register);
+
 app.listen(process.env.PORT || 3000);

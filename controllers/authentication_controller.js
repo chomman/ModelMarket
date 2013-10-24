@@ -15,11 +15,40 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // /login GET
-function login(req, res){
-	
+function get_login(req, res) {
+    res.render('authentication/login', { user : req.user });
+}
+
+// /login POST
+function post_login(req, res) {
+    res.redirect('/');
 }
 
 
+// /register GET
+function  get_register(req, res) {
+    res.render('authentication/register', { });
+}
+
+// /register POST
+function post_register(req, res) {
+    User.register(new User({ username : req.body.username }), req.body.password, function(err, account) {
+        if (err) {
+            return res.render('authentication/register', { account : account });
+        }
+        res.redirect('/');
+    });
+}
+
+// /logout GET
+function logout(req, res) {
+    req.logout();
+    res.redirect('/');
+}
 module.exports = {
-    get_login: login
+    get_login: get_login
+    ,post_login: post_login
+    ,get_register: get_register
+    ,post_register: post_register
+    ,get_logout: logout
 }

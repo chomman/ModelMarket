@@ -7,7 +7,7 @@ var File = require('./../models/file_schema');
 function home(req, res){
 	Model3d.model.find({}, function(err, results){
 		console.log(results);
-		res.render('navigation/home', {models: results});
+		res.render('navigation/home', {models: results, user : req.user});
 	});
 }
 
