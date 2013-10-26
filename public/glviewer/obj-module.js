@@ -288,45 +288,81 @@ function finishedModelDownload(data){
     var lines = text.split(/\n/);
     normalAccumilator = new Array();
     scene.vertices = new Array();
+
+    var vertex_pattern = /v( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
+    var normal_pattern = /vn( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
+    var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
+    var face_pattern1 = /f( +\d+)( +\d+)( +\d+)( +\d+)?/;
+    var face_pattern2 = /f( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))?/;
+    var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
+    var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
+
     for(var i =0; i < lines.length; i++){
         var line = lines[i];
-        var lineElems = line.split(" ");
-//            for(int i = 0; i < lineElems.length; i)
-        for(var j = 0; j < lineElems.length; j++){
-            if(lineElems[j] == ""){
-                lineElems.splice(j,1);
-                j--;
-            }
-        }
-        /*for(var j = 0; j < lineElems.length; j++){
-            lineElems[j] = lineElems[]
-        }*/
-        if(lineElems[0] == "v"){
 
-            //var vertex = vec3.create();
-            //vec3.set(vertex, parseFloat(lineElems[1]), parseFloat(lineElems[2]), parseFloat(lineElems[3]));
-            //scene.vertices.push(vertex);
-            scene.vertices.push(parseFloat(lineElems[1]));
-            scene.vertices.push(parseFloat(lineElems[2]));
-            scene.vertices.push(parseFloat(lineElems[3]));
+        if(line.length === 0 || line[0] === '#'){
+            continue;
+        }
+        else if ( ( result = vertex_pattern.exec( line ) ) !== null ) {
+            // ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+            scene.vertices.push(parseFloat( result[ 1 ] ));
+            scene.vertices.push(parseFloat( result[ 2 ] ));
+            scene.vertices.push(parseFloat( result[ 3 ] ));
             normalAccumilator.push(vec3.create());
-        }
-        else if(lineElems[0] == "f"){
 
-            var tempFace;
-            if(lineElems.length == 4){//triangle face
-                tempFace = vec3.fromValues(parseInt(lineElems[1])-1,parseInt(lineElems[2])-1,parseInt(lineElems[3])-1);
+
+        } else if ( ( result = normal_pattern.exec( line ) ) !== null ) {
+            // ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+        } else if ( ( result = uv_pattern.exec( line ) ) !== null ) {
+            // ["vt 0.1 0.2", "0.1", "0.2"]
+        } else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
+            // just a mesh, no textures or normals
+            // ["f 1 2 3", "1", "2", "3", undefined]
+            console.log(result);
+            if ( result[ 4 ] === undefined ) {
+                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[2] )-1,parseInt( result[3] )-1);
+                scene.faces.push(tempFace);        
+            } else {
+                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[2] )-1,parseInt( result[3] )-1);
+                scene.faces.push(tempFace);
+                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[3] )-1,parseInt( result[4] )-1);
+                scene.faces.push(tempFace);
             }
-            if(lineElems.length == 5){//quad face, open gl only does traingle so convert quad
-                tempFace = vec3.fromValues(lineElems[1],lineElems[2],lineElems[3]);
-                tempFace = vec3.fromValues(lineElems[3],lineElems[4],lineElems[1]);
+
+        } else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
+            // ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+            if ( result[ 10 ] === undefined ) {
+                tempFace = vec3.fromValues(parseInt( result[2] )-1,parseInt( result[5] )-1,parseInt( result[8] )-1);
+                scene.faces.push(tempFace);        
+            } else {
+                tempFace = vec3.fromValues(parseInt( result[2] )-1,parseInt( result[5] )-1,parseInt( result[8] )-1);
+                scene.faces.push(tempFace);
+                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[8] )-1,parseInt( result[11] )-1);
+                scene.faces.push(tempFace);
             }
-            scene.faces.push(tempFace);
+
+        } else if ( ( result = face_pattern3.exec( line ) ) !== null ) {
+
+            // ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
+
+        } else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
+            // ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+        } else if ( /^o /.test( line ) ) {            
+            // object
+        } else if ( /^g /.test( line ) ) {
+            // group
+        } else if ( /^usemtl /.test( line ) ) {
+            // material
+            //material.name = line.substring( 7 ).trim();
+        } else if ( /^mtllib /.test( line ) ) {
+            // mtl file
+        } else if ( /^s /.test( line ) ) {
+            // smooth shading
+        } else {
+           // console.log( "THREE.OBJLoader: Unhandled line " + line );
         }
     }
-    //console.log(scene.faces);
-    //console.log(normalAccumilator[0]);
-    
+    console.log(scene.faces.length);
     for(var i = 0; i < scene.faces.length; i++){
         var currFace = scene.faces[i];
         var vec12 = vec3.fromValues(
@@ -339,7 +375,7 @@ function finishedModelDownload(data){
             scene.vertices[currFace[2]*3+2]-scene.vertices[currFace[1]*3+2]);
         var cross12_23 = vec3.create();
         vec3.cross(cross12_23, vec12, vec23);
-        //console.log(cross12_23);
+       
         
         vec3.add(normalAccumilator[currFace[0]], normalAccumilator[currFace[0]], cross12_23);
         vec3.add(normalAccumilator[currFace[1]], normalAccumilator[currFace[1]], cross12_23);
