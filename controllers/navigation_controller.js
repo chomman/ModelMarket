@@ -20,6 +20,11 @@ function search(req, res){
 
 }
 
+function about(req, res){
+    res.render('about');
+}
+
 module.exports = {
-    get_home: home
+    get_home: home,
+    get_about: about
 }
