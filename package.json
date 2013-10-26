@@ -10,5 +10,6 @@
     "passport": "",
     "passport-local": "",
     "passport-local-mongoose": ""
+    "async": ""
   }
 }

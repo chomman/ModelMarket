@@ -5,10 +5,12 @@ var File = require('./../models/file_schema');
 
 // / GET
 function home(req, res){
-	Model3d.model.find({}, function(err, results){
-		console.log(results);
-		res.render('navigation/home', {models: results, user : req.user});
-	});
+    console.log("-----current user-------");
+    console.log(req.session);
+	Model3d.model.find({}).sort({views: -1}).execFind(function(err, results){
+        //console.log(results);
+        res.render('navigation/home', {models: results});
+    });
 }
 
 /* search? GET

@@ -16,7 +16,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // /login GET
 function get_login(req, res) {
-    res.render('authentication/login', { user : req.user });
+    res.render('authentication/login', {passport : req.session.passport || "" });
 }
 
 // /login POST
@@ -32,6 +32,12 @@ function  get_register(req, res) {
 
 // /register POST
 function post_register(req, res) {
+    console.log("--------new user----------");
+    console.log(req);
+    console.log(req.body.username);
+    console.log(req.body.password);
+    console.log("--------------------------");
+
     User.register(new User({ username : req.body.username }), req.body.password, function(err, account) {
         if (err) {
             return res.render('authentication/register', { account : account });

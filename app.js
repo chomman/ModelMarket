@@ -1,8 +1,36 @@
 var url = require('url');
+var passport = require('passport')
 //#express
 var express = require('express');
 var app = express();
+
+//------------------------------------------
+
+// # Setup Views
+app.set('views', __dirname + '/views')
+app.set('view engine', 'jade')
+// ----------------------
+
+// #Session stuff:
+app.use(express.static(__dirname + '/public'))
+app.use(express.cookieParser());
 app.use(express.bodyParser());
+
+app.use(express.session({secret: 'IMMABEAST'}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.configure(function(){
+  //...
+  app.use(function(req, res, next){
+    res.locals.passport = req.session.passport;
+    next();
+  });
+  //...
+});
+
+//--------------------------------
 
 // # Controllers:
 // 	This is where the controllers are defined
@@ -17,10 +45,6 @@ var authentication_controller = require('./controllers/authentication_controller
 var model3d = require('./models/model3d_schema');
 // -----------------------
 
-// # Setup Views
-app.set('views', __dirname + '/views')
-app.set('view engine', 'jade')
-// ----------------------
 
 // #DB# :
 // 	Set Up Data Base and pass it to all routes
@@ -37,18 +61,12 @@ global.root_path = __dirname;
 console.log(global.root_path);
 
 app.all('*', function(request, response, next)
-    {
-    request.mongoose = mongoose;
+{
+    console.log("goes through here");
+    //request.mongoose = mongoose;
     next();
 });
-//------------------------------------------
 
-// #Session stuff:
-app.use(express.static(__dirname + '/public'))
-app.use(express.cookieParser());
-app.use(express.session({secret: 'IMMABEAST'}));
-
-//--------------------------------
 
 // #Routes
 app.get('/', navigation_controller.get_home);
@@ -63,7 +81,7 @@ app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
 app.get('/register', authentication_controller.get_register);
 
-app.post('/login', authentication_controller.post_register);
+app.post('/login', passport.authenticate('local'), authentication_controller.post_login);
 app.post('/register', authentication_controller.post_register);
 
 app.listen(process.env.PORT || 3000);

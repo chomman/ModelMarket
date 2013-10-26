@@ -3,6 +3,8 @@
 var Model3d = require('./../models/model3d_schema');
 var File = require('./../models/file_schema');
 
+var async = require('async');
+
 // models/new GET
 function get_new(req, res){
     res.render('models/new');
@@ -29,25 +31,45 @@ function post_new(req, res){
     new_file.type = obj_file_type;
 
     
-
-    File.move(req.files.model.path, obj_file_name, function(err){
-        if(err)
-        {
-            console.log("There was an error moving the file to uploads");
-            console.log(err);
-        }
-        else console.log("File saved!");
+    async.parallel([
+        function(callback){
+            File.move(req.files.model.path, obj_file_name, function(err){
+                if(err)
+                {
+                    console.log("There was an error moving the file to uploads");
+                    console.log(err);
+                    callback(err);
+                }
+                else
+                {
+                    console.log("File saved!");
+                    callback(null, null); 
+                } 
+            });
+        },
+        function(callback){
+            new_model3d.save(function (err, product, numberAffected) {
+                if(err){
+                    console.log("There was an error saving the model3d to the db! \n" + err);
+                    callback(err);
+                }else
+                    callback(null, product);
+            });
+        },
+        function(callback){
+            new_file.save(function (err, product, numberAffected) {
+                if(err){
+                    console.log("There was an error saving the file to the db! \n" + err);
+                    callback(err);
+                }else
+                    callback(null, product);
+            });
+        }   
+    ], function (err, results){
+        console.log(results);
+        console.log("new model id: " + new_model3d.id);
+        res.redirect("models/"+new_model3d.id);
     });
-
-    new_model3d.save(function (err, product, numberAffected) {
-        if(err) console.log("There was an error saving the model3d to the db! \n" + err);
-    });
-    new_file.save(function (err, product, numberAffected) {
-        if(err) console.log("There was an error saving the file to the db! \n" + err);
-    });
-
-    console.log("new model id: " + new_model3d.id);
-    res.redirect("models/"+new_model3d.id);
 }
 
 // models/:id GET
