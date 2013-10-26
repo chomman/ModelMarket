@@ -12,16 +12,16 @@ html
           
           a.pure-menu-heading(href='/') Moderu
           ul
-            li
+            li(class=(selected == "home" ? 'pure-menu-selected' : ''))
               a(href='/') home
-            li
+            li(class=(selected == "search" ? 'pure-menu-selected' : ''))
               a(href='/') search
-            li
+            li(class=(selected == "categories" ? 'pure-menu-selected' : ''))
               a(href='/') categories
-            li
+            li(class=(selected == "about" ? 'pure-menu-selected' : ''))
               a(href='/about') about
-            li
-              a.menu-item-divided(href='/models/new') upload
+            li(class=(selected == "upload" ? 'pure-menu-selected' : 'menu-item-divided'))
+              a(href='/models/new') upload
             div.menu-item-divided
               if (passport.user)
                 img(src='http://placehold.it/50x50')
@@ -29,12 +29,16 @@ html
                 li
                   a(href='/logout') logout
               else 
-                a(href='/login') sign in
+                li(class=(selected == "login" ? 'pure-menu-selected' : ''))
+                  a(href='/login') sign in
 
-              
-      div.pure-u-1.flat-header.goddamnpadding
-        h1 Sexy Model Marketplace
-        .container
+      div.pure-u-1
+        .header
+          h1 Moderu
+          h2 #{selected}
+        .content
           block content
-        footer
-          p Nothing in the footer really... Copyright: project Hydra
+        .footer
+          p 
+            | Made by the people for the people
+            | © 2013 Project Hydra

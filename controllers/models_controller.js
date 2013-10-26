@@ -7,7 +7,7 @@ var async = require('async');
 
 // models/new GET
 function get_new(req, res){
-    res.render('models/new');
+    res.render('models/new', {selected: "upload"});
 }
 
 // models/new POST

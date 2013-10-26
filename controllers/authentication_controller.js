@@ -16,7 +16,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // /login GET
 function get_login(req, res) {
-    res.render('authentication/login', {passport : req.session.passport || "" });
+    res.render('authentication/login', {passport : req.session.passport, selected: "login"});
 }
 
 // /login POST

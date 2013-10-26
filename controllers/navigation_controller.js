@@ -9,7 +9,7 @@ function home(req, res){
     console.log(req.session);
 	Model3d.model.find({}).sort({views: -1}).execFind(function(err, results){
         //console.log(results);
-        res.render('navigation/home', {models: results});
+        res.render('navigation/home', {models: results, selected: "home"});
     });
 }
 
@@ -21,7 +21,7 @@ function search(req, res){
 }
 
 function about(req, res){
-    res.render('about');
+    res.render('about', {selected: "about"});
 }
 
 module.exports = {
