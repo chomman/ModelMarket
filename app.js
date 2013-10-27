@@ -27,7 +27,6 @@ app.configure(function(){
     res.locals.passport = req.session.passport;
     next();
   });
-  //...
 });
 
 //--------------------------------
@@ -37,6 +36,7 @@ app.configure(function(){
 var models_controller = require('./controllers/models_controller');
 var navigation_controller = require('./controllers/navigation_controller');
 var authentication_controller = require('./controllers/authentication_controller');
+var users_controller = require('./controllers/users_controller');
 
 // -----------------------
 
@@ -63,10 +63,10 @@ console.log(global.root_path);
 app.all('*', function(request, response, next)
 {
     console.log("goes through here");
-    //request.mongoose = mongoose;
     next();
 });
 
+console.log(app);
 
 // #Routes
 app.get('/', navigation_controller.get_home);
@@ -81,9 +81,13 @@ app.post('/models/:id/buy',  models_controller.post_buy);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
-app.get('/register', authentication_controller.get_register);
-
 app.post('/login', passport.authenticate('local'), authentication_controller.post_login);
-app.post('/register', authentication_controller.post_register);
+
+app.get('/users/register', users_controller.get_register);
+app.post('/users/register', users_controller.post_register);
+app.get('/users/:username', users_controller.get_show);
+app.get('/users/:username/edit', users_controller.get_edit);
+app.put('/users/:username/edit', users_controller.put_edit);
+app.del('/users/:username', users_controller.del);
 
 app.listen(process.env.PORT || 3000);

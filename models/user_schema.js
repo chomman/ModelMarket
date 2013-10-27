@@ -31,4 +31,11 @@ userSchema.plugin(passportLocalMongoose);
 
 var db_model = mongoose.model('User', userSchema);
 
-module.exports = db_model
+// username
+// callback(err, obj)
+
+module.exports.find_by_name = function(username, callback){
+    db_model.findOne({username: username}, callback);
+}
+
+module.exports.model = db_model

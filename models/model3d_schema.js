@@ -11,19 +11,17 @@ var modelSchema = new mongoose.Schema({
     type: String,
     index: false
   },
-  price: {
-    type: Number
-  },
+  price: Number,
   views: {
     type: Number,
     required: true,
     default: 0
   },
   creator: {
-    type: mongoose.Schema.Types.ObjectId,
-    index: true
+    type: String,
+    index: true,
+    required: true
   },
-  owners: Array,
   favorites: Array,
   upload: {
     type: mongoose.Schema.Types.ObjectId,

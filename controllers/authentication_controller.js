@@ -5,7 +5,7 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 
-var User = require('./../models/user_schema');
+var User = require('./../models/user_schema').model;
 
 // use static authenticate method of model in LocalStrategy
 passport.use(new LocalStrategy(User.authenticate()));
@@ -20,30 +20,8 @@ function get_login(req, res) {
 }
 
 // /login POST
-function post_login(req, res) {
+function post_login(req, res, serr) {
     res.redirect('/');
-}
-
-
-// /register GET
-function  get_register(req, res) {
-    res.render('authentication/register', { });
-}
-
-// /register POST
-function post_register(req, res) {
-    console.log("--------new user----------");
-    console.log(req);
-    console.log(req.body.username);
-    console.log(req.body.password);
-    console.log("--------------------------");
-
-    User.register(new User({ username : req.body.username }), req.body.password, function(err, account) {
-        if (err) {
-            return res.render('authentication/register', { account : account });
-        }
-        res.redirect('/');
-    });
 }
 
 // /logout GET
@@ -54,7 +32,8 @@ function logout(req, res) {
 module.exports = {
     get_login: get_login
     ,post_login: post_login
-    ,get_register: get_register
-    ,post_register: post_register
     ,get_logout: logout
+    ,current_user: function(req) {
+        return req.session.passport.user || null
+    }
 }

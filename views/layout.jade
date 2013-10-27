@@ -9,7 +9,6 @@ html
     #layout.pure-g-r 
       #menu.pure-u
         div.pure-menu.pure-menu-open
-          
           a.pure-menu-heading(href='/') Moderu
           ul
             li(class=(selected == "home" ? 'pure-menu-selected' : ''))
@@ -31,6 +30,8 @@ html
               else 
                 li(class=(selected == "login" ? 'pure-menu-selected' : ''))
                   a(href='/login') sign in
+                li(class=(selected == "register" ? 'pure-menu-selected' : ''))
+                  a(href='/register') register
 
       div.pure-u-1
         .header

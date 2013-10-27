@@ -75,9 +75,12 @@ block content
   h2 #{name}
   p
     | #{description}
+  p 
+    | by 
+    a(href='/users/#{creator}') #{creator}
   div
     a(class="pure-button pure-button-primary", href="#") Buy Now $#{price}
   div
     | views: #{views}
   div
-    canvas(id="my-canvas", style="width:500px, height:500px, background-color: rgba(1.0, 0.1, 0,0, 1.0)", onload="webGLStart();")
+    canvas.gl-player(id="my-canvas", onload="webGLStart();")

@@ -2,24 +2,33 @@
 // * * * * * * * * * * 
 var Model3d = require('./../models/model3d_schema');
 var File = require('./../models/file_schema');
+var User = require('./../models/user_schema');
+var Auth = require('./authentication_controller');
 
 var async = require('async');
 
 // models/new GET
 function get_new(req, res){
-    res.render('models/new', {selected: "upload"});
+    if(Auth.current_user(req) != null){
+        res.render('models/new', {selected: "upload"});
+    }else
+        res.redirect('/login');
+
 }
 
 // models/new POST
 function post_new(req, res){
     console.log(req.body);
     console.log(req.files.model.path);
+    console.log(Auth.current_user(req));
 
     var new_model3d = new Model3d.model({name : req.body.name || "undefined"
                                         ,description: req.body.description || "no description"
-                                        ,price: 5.00
+                                        ,price: parseFloat(req.body.price) || 0.0
+                                        ,creator: Auth.current_user(req)
                                         });
-
+    console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
+    console.log("user: " + Auth.current_user(req));
     var new_file = new File.model({owner: new_model3d.id});
 
     /*  This shit shoud probably be done in the file_schema module */
@@ -30,7 +39,7 @@ function post_new(req, res){
     new_file.location = obj_file_name;
     new_file.type = obj_file_type;
 
-    
+    //Do all 3 of these tasks in parallel asyncronously and then meetup at the end
     async.parallel([
         function(callback){
             File.move(req.files.model.path, obj_file_name, function(err){
@@ -75,7 +84,7 @@ function post_new(req, res){
 // models/:id GET
 function get_show(req, res){
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        if(err) res.render('something_broke :(');
+        if(err) res.status(501).send('something_broke :(');
         else
         {
             console.log(model_obj);
@@ -86,8 +95,10 @@ function get_show(req, res){
             {
                 console.log("yo: " + file_obj_array);
                 console.log(file_obj_array);
-                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price, views: model_obj.views});
+                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price, views: model_obj.views, creator: model_obj.creator});
             });
+
+            //save the model becasue we updated how many views it had
             model_obj.save();
         } 
     });
