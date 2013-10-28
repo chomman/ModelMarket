@@ -83,7 +83,7 @@ block content
   div
     | views: #{model.views}
   div
-    canvas.gl-player(id="my-canvas", onload="webGLStart();")
+    canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
   form.pure-form
     label.pure-radio(for="option-two")
       input(id="public", type="radio", name="optionsRadios", value="option1")
