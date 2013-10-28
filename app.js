@@ -76,6 +76,7 @@ app.get('/models/new', models_controller.get_new);
 app.post('/models/new', models_controller.post_new);
 app.get('/models/:id', models_controller.show);
 app.del('/models/:id', models_controller.del);
+app.get('/models/:id/edit', models_controller.get_edit);
 app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
 

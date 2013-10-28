@@ -92,7 +92,8 @@ function get_show(req, res){
             var parent_id = model_obj._id;
             File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
             {
-                var should_show_edit = (Auth.current_user(req) == model_obj.creator) ? true : false; 
+                var should_show_edit = (Auth.current_user(req) == model_obj.creator);
+                console.log("show_edit: " + should_show_edit);
                 res.render('models/show', {model: model_obj, model_URL: file_obj_array[0].location, description: model_obj.description, show_edit: should_show_edit});
             });
 
@@ -143,6 +144,7 @@ module.exports = {
     post_new: post_new,
     show: get_show,
     del: delete_model,
+    get_edit: get_model_edit,
     get_buy: get_buy,
     post_buy: post_buy
 }

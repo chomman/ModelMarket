@@ -17,6 +17,8 @@ var zoom = -8;
 function initGL(canvas) {
     try {
         gl = canvas.getContext("webgl");
+        console.log("w: " + canvas.width);
+        console.log("h: " + canvas.height);
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
     } catch (e) {
