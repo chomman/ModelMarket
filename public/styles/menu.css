@@ -10,6 +10,26 @@
     overflow-y: auto;
     -webkit-overflow-scroll: touch;
 }
+    #menu .profile-picture {
+        margin: 5px auto;
+        display: block;
+    }
+    #menu .login-container {
+        margin: 4px;
+        text-align: center;
+    }
+        #menu .login-container a{
+            padding-left: 0px;
+        }
+        #menu .login-container .user-link a:hover {
+            text-decoration: underline;
+            background-color: none;
+        }
+        #menu .pure-menu .user-link a:hover,
+        #menu .pure-menu .user-link a:focus {
+            background: #191818;
+        }
+
     #menu a {
         color: #999;
         border: none;
@@ -218,24 +238,6 @@
     line-height: 1.6em;
 }
 
-    .footer-license {
-        margin: 0;
-    }
-    .footer-copyright,
-    .footer-links {
-        text-align: right;
-        margin: 0;
-    }
-    .footer-links {
-        list-style: none;
-        padding: 0;
-    }
-    .footer-logo {
-        text-align: center;
-    }
-
-.gl-player{
-}
 a{
     color: #3498DB;
     text-decoration: none;

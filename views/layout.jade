@@ -21,17 +21,19 @@ html
               a(href='/about') about
             li(class=(selected == "upload" ? 'pure-menu-selected' : 'menu-item-divided'))
               a(href='/models/new') upload
-            div.menu-item-divided
-              if (passport.user)
-                img(src='http://placehold.it/50x50')
-                a hello, #{passport.user}
+            
+            if (passport.user)
+              div.login-container
+                img.profile-picture(src='http://placehold.it/125x125')
+                li.user-link
+                  a(href="/users/#{passport.user}") #{passport.user}
                 li
                   a(href='/logout') logout
-              else 
-                li(class=(selected == "login" ? 'pure-menu-selected' : ''))
-                  a(href='/login') sign in
-                li(class=(selected == "register" ? 'pure-menu-selected' : ''))
-                  a(href='users/register') register
+            else 
+              li(class=(selected == "login" ? 'pure-menu-selected' : ''))
+                a(href='/login') sign in
+              li(class=(selected == "register" ? 'pure-menu-selected' : ''))
+                a(href='users/register') register
 
       div.pure-u-1
         .header

@@ -3,6 +3,7 @@
 var Model3d = require('./../models/model3d_schema');
 var File = require('./../models/file_schema');
 var User = require('./../models/user_schema');
+var user_model = User.model;
 var Auth = require('./authentication_controller')
 
 
@@ -14,12 +15,12 @@ function  get_register(req, res) {
 // users/register POST
 function post_register(req, res) {
     console.log("--------new user----------");
-    console.log(req);
     console.log(req.body.username);
     console.log(req.body.password);
+    console.log(req.body.email)
     console.log("--------------------------");
 
-    User.model.register(new User({ username : req.body.username }), req.body.password, function(err, account) {
+    user_model.register(new user_model({ username : req.body.username, email: req.body.email}), req.body.password, function(err, account) {
         if (err) {
             return res.render('users/register', { account : account });
         }
