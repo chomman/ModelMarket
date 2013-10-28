@@ -84,5 +84,10 @@ block content
     | views: #{model.views}
   div
     canvas.gl-player(id="my-canvas", onload="webGLStart();")
-  -if(show_edit)
-    a(href="/models/#{model._id}/edit") edit
+  form.pure-form
+    label.pure-radio(for="option-two")
+      input(id="public", type="radio", name="optionsRadios", value="option1")
+        | Public
+      input(id="private", type="radio", name="optionsRadios", value="option1", checked)
+        | Private
+      button.pure-button.pure-button-primary(type="submit") Apply

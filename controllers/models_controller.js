@@ -88,14 +88,12 @@ function get_show(req, res){
         else
         {
             console.log(model_obj);
-            console.log("something: " + model_obj.price);
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
             File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
             {
-                console.log("yo: " + file_obj_array);
-                console.log(file_obj_array);
-                res.render('models/show', {name: model_obj.name, model_URL: file_obj_array[0].location, description: model_obj.description, price: model_obj.price, views: model_obj.views, creator: model_obj.creator});
+                var should_show_edit = (Auth.current_user(req) == model_obj.creator) ? true : false; 
+                res.render('models/show', {model: model_obj, model_URL: file_obj_array[0].location, description: model_obj.description, show_edit: should_show_edit});
             });
 
             //save the model becasue we updated how many views it had
@@ -107,6 +105,26 @@ function get_show(req, res){
 // models/:id DELETE
 function delete_model(req, res){
     res.send("deleting model");
+}
+
+// models/:id/edit GET
+function get_model_edit(req, res){
+    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        if(err){
+            console.log(err);
+            res.status(501).send('something_broke :(');
+            return;
+        }
+        if(Auth.current_user(req) == model_obj.creator){
+            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(file_obj_array, err)
+            {
+                res.render("models/edit", {model: model_obj, model_URL: file_obj_array[0].location});
+                return;
+            });
+        }else{
+            res.status(401).send('You are unauthorized to modify this model');
+        }
+    });
 }
 
 function get_buy(req, res){

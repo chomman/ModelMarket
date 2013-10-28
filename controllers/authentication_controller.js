@@ -16,6 +16,11 @@ passport.deserializeUser(User.deserializeUser());
 
 // /login GET
 function get_login(req, res) {
+    //prevent people logging in again
+    if(req.session.passport.user){
+        res.redirect('/');
+        return;
+    }
     res.render('authentication/login', {passport : req.session.passport, selected: "login"});
 }
 
