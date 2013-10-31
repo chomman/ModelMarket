@@ -1,13 +1,5 @@
 extend ../layout
-mixin model_link(name, description, views, url)
-    .div
-        a(href='#{url}')
-            h4 #{name}
-        p 
-            | #{description}
-        p
-            | #{views}
-        
+include ../mixins
 
 block content
     div

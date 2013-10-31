@@ -245,3 +245,12 @@ a{
 a:hover{
     color: #2980B9;
 }
+
+.model-list{
+
+}
+.model-list .model-image{
+    display: block;
+    margin-right: 10px;
+    margin-left: auto;
+}

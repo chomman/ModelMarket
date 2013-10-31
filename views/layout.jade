@@ -45,3 +45,12 @@ html
           p 
             | Made by the people for the people
             | © 2013 Project Hydra
+
+mixin model_link(name, description, views, url)
+  .div
+    a(href='#{url}')
+      h4 #{name}
+    p 
+      | #{description}
+    p
+      | #{views}
