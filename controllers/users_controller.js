@@ -30,9 +30,15 @@ function post_register(req, res) {
 
 // users/:username GET
 function get_show(req, res){
-    User.find_by_name(req.params.username, function(err, result){
+    User.find_by_name(req.params.username, function(err, user_result){
         if(err) console.log(err);
-        if(result) res.render('users/show', {user: result});
+        if(user_result)
+        {  
+            Model3d.model.find({creator: user_result.username}).sort({views: -1}).execFind(function(err, models){
+                //console.log(results);
+                res.render('users/show', {user: user_result, models: models});
+            });
+        }
         else res.status(404).send('Not found');
     });
 }

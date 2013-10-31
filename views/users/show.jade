@@ -1,6 +1,19 @@
 extends ../layout
 
+mixin model_link(name, description, views, url)
+  .div
+    a(href='#{url}')
+      h4 #{name}
+    p 
+      | #{description}
+    p
+      | #{views}
+
 block content
   h2 #{user.username}
+  div
+    h2 Models by this user:
+    -each m in models
+      mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
   p 
     | This is his page

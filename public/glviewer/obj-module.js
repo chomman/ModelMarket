@@ -320,7 +320,6 @@ function finishedModelDownload(data){
         } else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
             // just a mesh, no textures or normals
             // ["f 1 2 3", "1", "2", "3", undefined]
-            console.log(result);
             if ( result[ 4 ] === undefined ) {
                 tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[2] )-1,parseInt( result[3] )-1);
                 scene.faces.push(tempFace);        
@@ -395,9 +394,6 @@ function finishedModelDownload(data){
         vertexNormals.push(normalAccumilator[i][1]);
         vertexNormals.push(normalAccumilator[i][2]);
     }
-    console.log(vertexNormals);
-    console.log(vertexNormals.length);
-    console.log(scene.vertices.length);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
     modelVertexNormalBuffer.itemSize = 3;
     modelVertexNormalBuffer.numItems = normalAccumilator.length;
