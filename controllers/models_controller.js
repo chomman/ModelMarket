@@ -108,12 +108,46 @@ function delete_model(req, res){
     res.send("deleting model");
 }
 
+// models/:id/star
+function post_star(req, res){
+    //star button should not even apear if user isnt logged in
+    var current_username = Auth.current_user(req)
+    if(!current_username){
+        res.status(403).send("hacking?");
+        return;
+    }
+    async.waterfall([
+        function(callback){
+             Model3d.find_by_id(req.params.id, function(err, model_obj){
+                if(err) callback(err);
+                callback(null, model_obj);
+             });
+        },
+        function(model_obj, callback){
+            if(model_obj.favorites.indexOf(current_username) == -1)
+            {
+                model_obj.favorites =  model_obj.favorites || [];
+                model_obj.favorites.push(current_username);
+                model_obj.save();
+            };
+            callback(null, model_obj.favorites.length);
+        }
+    ],function (err, num_stars) {
+        if(!err) res.status(200).send(" " + num_stars);
+        else res.status(500).send();
+    });
+}
+// models/:id/unstar
+function post_unstar(req, res){
+
+}
+
 // models/:id/edit GET
 function get_model_edit(req, res){
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
         if(err){
             console.log(err);
-            res.status(501).send('something_broke :(');
+            res.status(500).send('something_broke :(');
             return;
         }
         if(Auth.current_user(req) == model_obj.creator){
@@ -146,5 +180,7 @@ module.exports = {
     del: delete_model,
     get_edit: get_model_edit,
     get_buy: get_buy,
-    post_buy: post_buy
+    post_buy: post_buy,
+    post_star: post_star,
+    post_unstar: post_unstar
 }

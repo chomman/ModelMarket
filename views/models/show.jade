@@ -70,9 +70,36 @@ block content
   script.
     var modelURL = "/uploads/" + '#{model_URL}';
     $( document ).ready( function(){
-            webGLStart();
-        } );
-  h2 #{model.name}
+      webGLStart();
+      $("#a-star").click(function() {
+        $.post("/models/#{model._id}/star", function(data){
+            console.log(data);
+          })
+        console.log("a was clicked"); // or alert("click");
+      });
+    });
+
+  h1.show-header #{model.name}
+  div.pure-menu.pure-menu-open.pure-menu-horizontal
+    ul.show-gl-menu
+      if show_edit
+        li
+          a(href="/models/#{model._id}/edit")
+            i(class="fa fa-pencil fa-lg")
+              |  Edit
+      li
+        a(id="a-star")
+          i(class="fa fa-star-o fa-lg")
+            |  #{model.favorites.length || 0}
+      li
+        a(href="/models/#start/edit")
+          i(class="fa fa-fullscreen fa-lg")
+            |  Full Screen
+        
+
+  div
+    canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
+  
   p
     | #{model.description}
   p 
@@ -82,7 +109,3 @@ block content
     a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
   div
     | views: #{model.views}
-  div
-    canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  if show_edit
-    a(href="/models/#{model._id}/edit") edit

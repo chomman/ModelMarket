@@ -66,8 +66,6 @@ app.all('*', function(request, response, next)
     next();
 });
 
-console.log(app);
-
 // #Routes
 app.get('/', navigation_controller.get_home);
 app.get('/about', navigation_controller.get_about);
@@ -79,6 +77,8 @@ app.del('/models/:id', models_controller.del);
 app.get('/models/:id/edit', models_controller.get_edit);
 app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
+app.post('/models/:id/star', models_controller.post_star);
+app.post('/models/:id/un-star', models_controller.post_unstar);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
@@ -91,4 +91,5 @@ app.get('/users/:username/edit', users_controller.get_edit);
 app.put('/users/:username/edit', users_controller.put_edit);
 app.del('/users/:username', users_controller.del);
 
+console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);
