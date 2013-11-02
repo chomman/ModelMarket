@@ -69,13 +69,24 @@ block content
     }
   script.
     var modelURL = "/uploads/" + '#{model_URL}';
+    var starred = #{starred};
+    var loggedIn = #{logged_in}
     $( document ).ready( function(){
       webGLStart();
       $("#a-star").click(function() {
-        $.post("/models/#{model._id}/star", function(data){
-            console.log(data);
-          })
-        console.log("a was clicked"); // or alert("click");
+        if(loggedIn){
+          console.log($(this));
+          $( this ).removeClass("fa-star-o fa-star").addClass("fa-spinner fa-spin")
+          console.log("a was clicked"); // or alert("click");
+        
+          $.post(starred ? "/models/#{model._id}/unstar" : "/models/#{model._id}/star", function(data){
+            console.log("number of stars: " + data);
+
+              $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
+              $("#star-holder").text(data);
+              starred = !starred;
+            });
+          }
       });
     });
 
@@ -86,15 +97,20 @@ block content
         li
           a(href="/models/#{model._id}/edit")
             i(class="fa fa-pencil fa-lg")
-              |  Edit
-      li
-        a(id="a-star")
-          i(class="fa fa-star-o fa-lg")
-            |  #{model.favorites.length || 0}
+            |  Edit
+      - var CLASS = logged_in ? "" : "pure-menu-disabled"
+      li(class=CLASS, id="star-holder")
+
+        a
+          if starred
+            i(id="a-star", class="fa fa-star fa-lg")
+          else
+            i(id="a-star", class="fa fa-star-o fa-lg")
+          |  #{model.favorites.length || 0}
       li
         a(href="/models/#start/edit")
           i(class="fa fa-fullscreen fa-lg")
-            |  Full Screen
+          |  Full Screen
         
 
   div

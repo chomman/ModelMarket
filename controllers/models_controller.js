@@ -92,13 +92,22 @@ function get_show(req, res){
             var parent_id = model_obj._id;
             File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
             {
-                var should_show_edit = (Auth.current_user(req) == model_obj.creator);
-                console.log("show_edit: " + should_show_edit);
-                res.render('models/show', {model: model_obj, model_URL: file_obj_array[0].location, description: model_obj.description, show_edit: should_show_edit});
+                var should_show_edit = (Auth.current_user(req) === model_obj.creator);
+                console.log("show_edit: " + should_show_edit + "for user: " + Auth.current_user(req));
+                var starred = model_obj.favorites.indexOf(Auth.current_user(req)) != -1;
+                var logged_in = Auth.current_user(req) != null;
+                res.render('models/show', {model: model_obj
+                                          ,model_URL: file_obj_array[0].location
+                                          , description: model_obj.description
+                                          , show_edit: should_show_edit
+                                          , starred: starred
+                                          , logged_in: logged_in});
             });
 
             //save the model becasue we updated how many views it had
-            model_obj.save();
+            model_obj.save(function(err){
+                console.log(err);
+            });
         } 
     });
 }
@@ -110,6 +119,19 @@ function delete_model(req, res){
 
 // models/:id/star
 function post_star(req, res){
+    console.log("upadting star ++");
+    toggle_star(req, res, true);
+}
+// models/:id/unstar
+function post_unstar(req, res){
+    toggle_star(req, res, false);
+}
+
+// function toggle_star
+//@param req: the http reqest
+//@param res: the http respose
+//@param increase: (bool) to increase or decrease the star cound for this model
+function toggle_star(req, res, increase){
     //star button should not even apear if user isnt logged in
     var current_username = Auth.current_user(req)
     if(!current_username){
@@ -124,22 +146,25 @@ function post_star(req, res){
              });
         },
         function(model_obj, callback){
-            if(model_obj.favorites.indexOf(current_username) == -1)
+            var index = model_obj.favorites.indexOf(current_username);
+            if(index == -1 && increase)
             {
                 model_obj.favorites =  model_obj.favorites || [];
                 model_obj.favorites.push(current_username);
                 model_obj.save();
-            };
+            }
+            else if(!increase){
+                model_obj.favorites.splice(index, 1);
+                model_obj.save();
+            }
             callback(null, model_obj.favorites.length);
         }
     ],function (err, num_stars) {
+        console.log("got this far");
+
         if(!err) res.status(200).send(" " + num_stars);
         else res.status(500).send();
     });
-}
-// models/:id/unstar
-function post_unstar(req, res){
-
 }
 
 // models/:id/edit GET

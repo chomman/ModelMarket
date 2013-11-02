@@ -78,7 +78,7 @@ app.get('/models/:id/edit', models_controller.get_edit);
 app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
 app.post('/models/:id/star', models_controller.post_star);
-app.post('/models/:id/un-star', models_controller.post_unstar);
+app.post('/models/:id/unstar', models_controller.post_unstar);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
