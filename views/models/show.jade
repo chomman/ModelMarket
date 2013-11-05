@@ -122,6 +122,14 @@ block content
     | by 
     a(href='/users/#{model.creator}') #{model.creator}
   div
+    form(action="models/buy",method="POST")
+      script(
+        src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button",
+        data-key="pk_test_czwzkTp2tactuLOEOqbMTRzG",
+        data-amount="#{model.price}",
+        data-name="#{model.name}",
+        data-description="Model download rights",
+        data-image="/128x128.png")
     a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
   div
     | views: #{model.views}
