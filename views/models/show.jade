@@ -20,9 +20,8 @@ block append content
         
           $.post(starred ? "/models/#{model._id}/unstar" : "/models/#{model._id}/star", function(data){
             console.log("number of stars: " + data);
-
               $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
-              $("#star-holder").text(data);
+              $("#star-counter").text(data);
               starred = !starred;
             });
           }
@@ -45,7 +44,8 @@ block append content
             i(id="a-star", class="fa fa-star fa-lg")
           else
             i(id="a-star", class="fa fa-star-o fa-lg")
-          |  #{model.favorites.length || 0}
+          span(id="star-counter")
+            |  #{model.favorites.length || 0}
       li
         a(href="/models/#start/edit")
           i(class="fa fa-fullscreen fa-lg")
