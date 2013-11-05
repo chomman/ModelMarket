@@ -5,6 +5,8 @@ block content
   script(src="/vendor/jquery-2.js")
 
   script(src="/glviewer/obj-module.js")
+  script(src="https://checkout.stripe.com/v2/checkout.js")
+
   script(id="shader-fs", type="x-shader/x-fragment").
     precision mediump float;
 
@@ -122,14 +124,27 @@ block content
     | by 
     a(href='/users/#{model.creator}') #{model.creator}
   div
-    form(action="models/buy",method="POST")
-      script(
-        src="https://checkout.stripe.com/v2/checkout.js" class="stripe-button",
-        data-key="pk_test_czwzkTp2tactuLOEOqbMTRzG",
-        data-amount="#{model.price}",
-        data-name="#{model.name}",
-        data-description="Model download rights",
-        data-image="/128x128.png")
-    a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
+    a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
+    script.
+      $('#buy-btn').click(function(){
+        var token = function(res){
+          var $input = $('<input type=hidden name=stripeToken />').val(res.id);
+          $('form').append($input).submit();
+        };
+
+        StripeCheckout.open({
+          key:         'pk_test_czwzkTp2tactuLOEOqbMTRzG',
+          address:     false,
+          amount:      #{model.price*100},
+          currency:    'usd',
+          name:        '#{model.name}',
+          description: 'Download rights',
+          panelLabel:  'Checkout',
+          image:       'http://placehold.it/128x128',
+          token:       token
+        });
+
+        return false;
+      });
   div
     | views: #{model.views}
