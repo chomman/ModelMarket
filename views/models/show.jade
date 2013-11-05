@@ -35,7 +35,7 @@ block append content
         li
           a(href="/models/#{model._id}/edit")
             i(class="fa fa-pencil fa-lg")
-            |  Edit
+            |  Editf
       - var CLASS = logged_in ? "" : "pure-menu-disabled"
       li(class=CLASS, id="star-holder")
 
@@ -53,14 +53,14 @@ block append content
         
 
   div
-    canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  
-  p
-    | #{model.description}
-  p 
-    | by 
-    a(href='/users/#{model.creator}') #{model.creator}
-  div
-    a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
-  div
-    | views: #{model.views}
+    canvas.gl-player.model-canvas(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
+  div.model-description
+    p
+      | #{model.description}
+    p 
+      | by 
+      a(href='/users/#{model.creator}') #{model.creator}
+    div
+      a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
+    div
+      | views: #{model.views}

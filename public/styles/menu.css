@@ -260,3 +260,19 @@ a:hover{
 .show-header{
     text-align: center;
 }
+.model-description{
+    background-color: #F0F0F0;
+    border-style: solid;
+    border-top-style: none;
+    border-color: #D0D0D0;
+    border-width: 1px;
+    border-radius: 3px;
+    padding: 5px;
+}
+.model-canvas{
+    border-style: solid;
+    border-bottom-style: none;
+    border-color: #D0D0D0;
+    border-width: 1px;
+    border-radius: 3px;
+}
