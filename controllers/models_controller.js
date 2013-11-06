@@ -5,6 +5,10 @@ var File = require('./../models/file_schema');
 var User = require('./../models/user_schema');
 var Auth = require('./authentication_controller');
 
+var stripe = require("stripe")(
+  "sk_test_SBwGeHO10EJ0xTnmImA0W3uC"
+);
+
 var async = require('async');
 
 // models/new GET
@@ -197,11 +201,12 @@ function get_buy(req, res){
 function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey("sk_test_SBwGeHO10EJ0xTnmImA0W3uC");
-    var stripeToken = request.body.stripeToken;
-    var amount = request.body.amount;
-    var currency = request.body.currency;
-    var description = request.body.description;
+    var stripeToken = req.body.stripeToken;
+    var amount = req.body.amount;
+    var currency = req.body.currency;
+    var description = req.body.description;
     console.log(amount);
+    console.log("crap");
     var charge = stripe.charges.create({
         amount: amount, // amount in cents, again
         currency: currency,
@@ -213,7 +218,7 @@ function post_buy(req, res){
     }
 });
     console.log("Made charge");
-    //res.send("Thanks, for your purchase");
+    res.send("Thanks for purchase");
 }
 
 module.exports = {
