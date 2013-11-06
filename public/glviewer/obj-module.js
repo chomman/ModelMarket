@@ -141,8 +141,8 @@ function drawScene() {
     if(modelLoaded){
         mvPushMatrix();
         mat4.translate(mvMatrix, mvMatrix, [0, 0, 0.0]);
-        mat4.rotate(mvMatrix, mvMatrix, 0.3*Math.sin(xoff), [1.0, 0.0, 0.0]);
-        mat4.rotate(mvMatrix, mvMatrix, 0.4*Math.cos(2*xoff), [0.0, 0.0, 1.0]);
+        //mat4.rotate(mvMatrix, mvMatrix, 0.3*Math.sin(xoff), [1.0, 0.0, 0.0]);
+        //mat4.rotate(mvMatrix, mvMatrix, 0.4*Math.cos(2*xoff), [0.0, 0.0, 1.0]);
         mat4.rotate(mvMatrix, mvMatrix, xoff, [0.0, 1.0, 0.0]);
         
         //mat4.translate(mvMatrix, mvMatrix, [0, 0, 1.0]);
@@ -232,6 +232,7 @@ function webGLStart() {
 
     tick();
 }
+
 function initMouseGestures() {
     var mousedown = false;
     var canvas = $('#my-canvas');
@@ -252,10 +253,13 @@ function initMouseGestures() {
     canvas.mousemove(function(event){
         console.log(mousedown);
         if(mousedown){
+            var xdiff = event.offsetX - coord.x;
             var ydiff = event.offsetY - coord.y;
             coord.y = event.offsetY;
-            zoom += .1*ydiff;   
-            console.log("doing this");    
+            coord.x = event.offsetX;
+            xoff += .01*xdiff;
+            zoom += .1*ydiff;
+            console.log("doing this");   
         }
 
     });
@@ -271,7 +275,7 @@ function animate() {
 var timeNow = new Date().getTime();
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
-        xoff += (1 * elapsed) / 1000.0;
+        //xoff += (1 * elapsed) / 1000.0;
         //rSquare += (75 * elapsed) / 1000.0;
     }
     lastTime = timeNow;
