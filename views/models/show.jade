@@ -123,28 +123,29 @@ block content
   p 
     | by 
     a(href='/users/#{model.creator}') #{model.creator}
-  div
-    a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
-    script.
-      $('#buy-btn').click(function(){
-        var token = function(res){
-          var $input = $('<input type=hidden name=stripeToken />').val(res.id);
-          $('form').append($input).submit();
-        };
+  form(action="/models/#{model._id}/buy" method="post")
+    div
+      a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
+      script.
+        $('#buy-btn').click(function(){
+          var token = function(res){
+            var $input = $('<input type=hidden name=stripeToken />').val(res.id);
+            $('form').append($input).submit();
+          };
 
-        StripeCheckout.open({
-          key:         'pk_test_czwzkTp2tactuLOEOqbMTRzG',
-          address:     false,
-          amount:      #{model.price*100},
-          currency:    'usd',
-          name:        '#{model.name}',
-          description: 'Download rights',
-          panelLabel:  'Checkout',
-          image:       'http://placehold.it/128x128',
-          token:       token
+          StripeCheckout.open({
+            key:         'pk_test_czwzkTp2tactuLOEOqbMTRzG',
+            address:     false,
+            amount:      #{model.price*100},
+            currency:    'usd',
+            name:        '#{model.name}',
+            description: 'Download rights',
+            panelLabel:  'Checkout',
+            image:       'http://placehold.it/128x128',
+            token:       token
+          });
+
+          return false;
         });
-
-        return false;
-      });
   div
     | views: #{model.views}
