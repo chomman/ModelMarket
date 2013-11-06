@@ -201,7 +201,7 @@ function get_buy(req, res){
 }
 function post_buy(req, res){
     console.log("Reached here");
-    stripe.setApiKey(global.keys.stripe);
+    stripe.setApiKey(global.keys.stripeSecretTest);
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
     var currency = req.body.currency;
@@ -210,7 +210,7 @@ function post_buy(req, res){
     console.log(stripeToken);
     console.log("crap");
     var charge = stripe.charges.create({
-        amount: 4000, // amount in cents, again
+        amount: amount, // amount in cents, again
         currency: "usd",
         card: stripeToken,
         description: "description"

@@ -129,12 +129,13 @@ block content
       script.
         $('#buy-btn').click(function(){
           var token = function(res){
-            var $input = $('<input type=hidden name=stripeToken />').val(res.id);
-            $('form').append($input).submit();
+            var $sToken = $('<input type=hidden name=stripeToken />').val(res.id);
+            var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
+            $('form').append($sToken, $amount).submit();
           };
 
           StripeCheckout.open({
-            key:         '#{keys.stripe_public}',
+            key:         '#{keys.stripePublishTest}',
             address:     false,
             amount:      #{model.price*100},
             currency:    'usd',
