@@ -2,4 +2,5 @@
 uploads/*
 public/uploads/*
 node_modules/
+keys.json
 *.swp
