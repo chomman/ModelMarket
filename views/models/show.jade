@@ -1,11 +1,10 @@
 extend ../layout
-block append content
+block content
   script(src="/vendor/gl-matrix2.js")
   script(src="/vendor/webgl-utils.js")
   script(src="/vendor/jquery-2.js")
 
   script(src="/glviewer/obj-module.js")
-<<<<<<< HEAD
   script(src="https://checkout.stripe.com/v2/checkout.js")
 
   script(id="shader-fs", type="x-shader/x-fragment").
@@ -70,9 +69,6 @@ block append content
         vTextureCoord = aTextureCoord;
         vReflectiveTextureCoord = vec2(0.5, 0.5) + vec2(transformedNormal[0]*.5, transformedNormal[1]*.5);        
     }
-=======
-  include shaders
->>>>>>> cf38b18738bc7c7bae8a04d643f25bd62704e14a
   script.
     var modelURL = "/uploads/" + '#{model_URL}';
     var starred = #{starred};
@@ -87,8 +83,9 @@ block append content
         
           $.post(starred ? "/models/#{model._id}/unstar" : "/models/#{model._id}/star", function(data){
             console.log("number of stars: " + data);
+
               $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
-              $("#star-counter").text(data);
+              $("#star-holder").text(data);
               starred = !starred;
             });
           }
@@ -102,7 +99,7 @@ block append content
         li
           a(href="/models/#{model._id}/edit")
             i(class="fa fa-pencil fa-lg")
-            |  Editf
+            |  Edit
       - var CLASS = logged_in ? "" : "pure-menu-disabled"
       li(class=CLASS, id="star-holder")
 
@@ -111,8 +108,7 @@ block append content
             i(id="a-star", class="fa fa-star fa-lg")
           else
             i(id="a-star", class="fa fa-star-o fa-lg")
-          span(id="star-counter")
-            |  #{model.favorites.length || 0}
+          |  #{model.favorites.length || 0}
       li
         a(href="/models/#start/edit")
           i(class="fa fa-fullscreen fa-lg")
@@ -120,7 +116,6 @@ block append content
         
 
   div
-<<<<<<< HEAD
     canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
   
   p
@@ -154,16 +149,3 @@ block append content
         });
   div
     | views: #{model.views}
-=======
-    canvas.gl-player.model-canvas(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  div.model-description
-    p
-      | #{model.description}
-    p 
-      | by 
-      a(href='/users/#{model.creator}') #{model.creator}
-    div
-      a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
-    div
-      | views: #{model.views}
->>>>>>> cf38b18738bc7c7bae8a04d643f25bd62704e14a
