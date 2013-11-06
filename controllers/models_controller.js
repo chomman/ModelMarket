@@ -206,15 +206,16 @@ function post_buy(req, res){
     var currency = req.body.currency;
     var description = req.body.description;
     console.log(amount);
+    console.log(stripeToken);
     console.log("crap");
     var charge = stripe.charges.create({
-        amount: amount, // amount in cents, again
-        currency: currency,
+        amount: 4000, // amount in cents, again
+        currency: "usd",
         card: stripeToken,
-        description: description
+        description: "description"
     }, function(err, charge) {
     if (err && err.type === 'StripeCardError') {
-    // The card has been declined
+        console.log("ERROR");
     }
 });
     console.log("Made charge");
