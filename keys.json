@@ -1,3 +1,4 @@
 {
-    "stripe" : "<yourkeyhere>"
+    "stripe" : "sk_test_SBwGeHO10EJ0xTnmImA0W3uC",
+    "stripe_public" : "pk_test_SdJIky6Li3TVrneEZb2DPzlo"
 }

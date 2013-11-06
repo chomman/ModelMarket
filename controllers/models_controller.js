@@ -201,7 +201,7 @@ function get_buy(req, res){
 }
 function post_buy(req, res){
     console.log("Reached here");
-    stripe.setApiKey("sk_test_SBwGeHO10EJ0xTnmImA0W3uC");
+    stripe.setApiKey(global.keys.stripe);
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
     var currency = req.body.currency;
@@ -217,7 +217,7 @@ function post_buy(req, res){
     if (err && err.type === 'StripeCardError') {
     // The card has been declined
     }
-});
+    });
     console.log("Made charge");
     res.send("Thanks for purchase");
 }

@@ -7,7 +7,7 @@ var File = require('./../models/file_schema');
 function home(req, res){
     console.log("-----current user-------");
     console.log(req.session);
-	Model3d.model.find({}).sort({views: -1}).execFind(function(err, results){
+	Model3d.model.find({}).sort({views: -1}).exec(function(err, results){
         //console.log(results);
         res.render('navigation/home', {models: results, selected: "home"});
     });

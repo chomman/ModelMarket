@@ -134,7 +134,7 @@ block content
           };
 
           StripeCheckout.open({
-            key:         '#{keys.stripe}',
+            key:         '#{keys.stripe_public}',
             address:     false,
             amount:      #{model.price*100},
             currency:    'usd',
