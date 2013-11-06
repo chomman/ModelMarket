@@ -196,7 +196,25 @@ function get_buy(req, res){
     //res.render('models/buy', {});
 }
 function post_buy(req, res){
-    res.send("Thanks, for your purchase");
+    console.log("Reached here");
+    stripe.setApiKey("sk_test_SBwGeHO10EJ0xTnmImA0W3uC");
+    var stripeToken = request.body.stripeToken;
+    var amount = request.body.amount;
+    var currency = request.body.currency;
+    var description = request.body.description;
+    console.log(amount);
+    var charge = stripe.charges.create({
+        amount: amount, // amount in cents, again
+        currency: currency,
+        card: stripeToken,
+        description: description
+    }, function(err, charge) {
+    if (err && err.type === 'StripeCardError') {
+    // The card has been declined
+    }
+});
+    console.log("Made charge");
+    //res.send("Thanks, for your purchase");
 }
 
 module.exports = {
