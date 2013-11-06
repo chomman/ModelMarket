@@ -66,6 +66,19 @@ app.all('*', function(request, response, next)
     next();
 });
 
+var fs = require('fs');
+var keysfile = __dirname + '/keys.json';
+ 
+fs.readFile(keysfile, 'utf8', function (err, data) {
+  if (err) {
+    console.log('Error reading keys!: ' + err);
+    return;
+  }
+ 
+  data = JSON.parse(data);
+  global.keys = data;
+});
+
 // #Routes
 app.get('/', navigation_controller.get_home);
 app.get('/about', navigation_controller.get_about);

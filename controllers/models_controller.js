@@ -101,7 +101,8 @@ function get_show(req, res){
                                           , description: model_obj.description
                                           , show_edit: should_show_edit
                                           , starred: starred
-                                          , logged_in: logged_in});
+                                          , logged_in: logged_in
+                                          , keys: global.keys});
             });
 
             //save the model becasue we updated how many views it had
