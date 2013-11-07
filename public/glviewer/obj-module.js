@@ -221,11 +221,9 @@ function webGLStart() {
     //canvas.height = $(window).height()*.9; 
     initGL(canvas);
     initShaders();
-    //initBuffers();
     initScene();
     initMouseGestures();
-    //initTexture();
-    getModelFromFile(modelURL);
+    getModelFromFile(modelURL, canvas);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -463,7 +461,49 @@ function finishedModelDownload(data){
     //drawScene();
 }
 function getModelFromFile(modelURL){
-    $.get(modelURL, finishedModelDownload, 'text')
+    var loader = $('#loaderbar').width(1);
+    var canvas = $('#my-canvas');
+    (function addXhrProgressEvent($) {
+        var originalXhr = $.ajaxSettings.xhr;
+        $.ajaxSetup({
+            progress: function() { console.log("standard progress callback"); },
+            xhr: function() {
+                var req = originalXhr(), that = this;
+                if (req) {
+                    if (typeof req.addEventListener == "function") {
+                        req.addEventListener("progress", function(evt) {
+                            that.progress(evt);
+                        },false);
+                    }
+                }
+                return req;
+            }
+        });
+    })($);
+    $.ajax({
+        url: modelURL,
+        type: "GET",
+        dataType: "text/html",
+        success: function() { console.log("hello?")},
+        complete: function(data) {
+            $('#loaderbar').width(canvas.width()).animate({
+                height: '0px',
+                opacity: '0'
+                }, 500);
+            finishedModelDownload(data.responseText);
+
+        },
+        progress: function(evt) {
+            if (evt.lengthComputable) {
+                loader.width(canvas.width()*evt.loaded / evt.total );
+            }
+            else {
+                console.log("Length not computable.");
+            }
+        }
+     
+    });
+    //$.get(modelURL, finishedModelDownload, 'text')
 }
 
 function face(_v1, _v2, _v3){

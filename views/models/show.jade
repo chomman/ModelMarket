@@ -114,10 +114,9 @@ block content
           i(class="fa fa-fullscreen fa-lg")
           |  Full Screen
         
-
+  div.loader(id="loaderbar")
   div
     canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  
   div.model-description
     p
       | #{model.description}

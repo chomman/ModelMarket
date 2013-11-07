@@ -275,3 +275,8 @@ a:hover{
     border-width: 1px;
     border-radius: 3px;
 }
+.loader{
+    width: 500px;
+    height: 5px;
+    background-color: blue;
+}
