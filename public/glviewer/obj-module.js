@@ -15,28 +15,13 @@ var zoom = -8;
 
 
 
-function initGL(canvas) {
-    try {
-        gl = canvas.getContext("webgl");
-        console.log("w: " + canvas.width);
-        console.log("h: " + canvas.height);
-        gl.viewportWidth = canvas.width;
-        gl.viewportHeight = canvas.height;
-    } catch (e) {
-    }
-    if (!gl) {
-        alert("Could not initialise WebGL, sorry :-(  Try Chrome?");
-    }
-}
-function onMouseWheel(event) {
-    event.preventDefault();
-    if (true) {
-      zoom += .005*event.wheelDeltaY;
-    }
-    return false;
-}
 
- function getShader(gl, id) {
+/***************************************************************/
+/*---------------------------SHADERS---------------------------*/
+/***************************************************************/
+
+var shaderProgram;
+function getShader(gl, id) {
     var shaderScript = document.getElementById(id);
     if (!shaderScript) {
         return null;
@@ -70,19 +55,6 @@ function onMouseWheel(event) {
 
     return shader;
 }
-
-function handleLoadedTexture(texture) {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D, null);
-}
-
-var shaderProgram;
-
 function initShaders() {
     var fragmentShader = getShader(gl, "shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
@@ -119,8 +91,34 @@ function initShaders() {
 }
 
 
+
+
+/***************************************************************/
+/*---------------------------DRAWING---------------------------*/
+/***************************************************************/
+
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
+
+function mvPushMatrix() {
+    var copy = mat4.create();
+    copy = mat4.clone(mvMatrix);
+    //mat4.set(mvMatrix, copy);
+    mvMatrixStack.push(copy);
+}
+function mvPopMatrix() {
+    if (mvMatrixStack.length == 0) {
+        throw "Invalid popMatrix!";
+    }
+    mvMatrix = mvMatrixStack.pop();
+}
+
+function customInvert43(matrix){
+    var returnmat = mat3.create(); 
+    mat3.fromMat4(returnmat, matrix);
+    mat3.invert(returnmat, returnmat);
+    return returnmat;
+}
 
 function setMatrixUniforms() {
     gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
@@ -204,13 +202,27 @@ function drawScene() {
         mvPopMatrix();
     }
 }
-function customInvert43(matrix){
-    var returnmat = mat3.create(); 
-    mat3.fromMat4(returnmat, matrix);
-    mat3.invert(returnmat, returnmat);
-    return returnmat;
-}
 
+
+
+
+/***************************************************************/
+/*------------------------INITALIZATION------------------------*/
+/***************************************************************/
+
+function initGL(canvas) {
+    try {
+        gl = canvas.getContext("webgl");
+        console.log("w: " + canvas.width);
+        console.log("h: " + canvas.height);
+        gl.viewportWidth = canvas.width;
+        gl.viewportHeight = canvas.height;
+    } catch (e) {
+    }
+    if (!gl) {
+        alert("Could not initialise WebGL, sorry :-(  Try Chrome?");
+    }
+}
 
 function webGLStart() {
     var canvas = document.getElementById("my-canvas");
@@ -225,6 +237,12 @@ function webGLStart() {
     gl.enable(gl.DEPTH_TEST);
 
     tick();
+}
+
+function initScene(){
+    scene = new Object();
+    scene.vertices = new Array();
+    scene.faces = new Array();
 }
 
 function initMouseGestures() {
@@ -259,6 +277,18 @@ function initMouseGestures() {
 
     });
 }
+
+
+function onMouseWheel(event) {
+    event.preventDefault();
+    zoom += .005*event.wheelDeltaY;
+}
+
+
+/***************************************************************/
+/*---------------------------RUNNING---------------------------*/
+/***************************************************************/
+
 function tick(){
     animate();
     drawScene();
@@ -275,6 +305,11 @@ var timeNow = new Date().getTime();
     }
     lastTime = timeNow;
 }
+
+
+/***************************************************************/
+/*------------------------MODEL PARSING------------------------*/
+/***************************************************************/
 
 
 var modelVertexPositionBuffer;
@@ -513,46 +548,6 @@ function face(_v1, _v2, _v3){
         this.normal = normal;
     }
 }
-function initScene(){
-    scene = new Object();
-    scene.vertices = new Array();
-    scene.faces = new Array();
-}
-function mvPushMatrix() {
-    var copy = mat4.create();
-    copy = mat4.clone(mvMatrix);
-    //mat4.set(mvMatrix, copy);
-    mvMatrixStack.push(copy);
-}
-function mvPopMatrix() {
-    if (mvMatrixStack.length == 0) {
-        throw "Invalid popMatrix!";
-    }
-    mvMatrix = mvMatrixStack.pop();
-}
-function render(a){
-    var x = document.getElementById("selection").options[document.getElementById("selection").selectedIndex].value;
-    var filename;
-    if(x == 1) {
-        filename = "teapot.obj";
-    }
-    else if(x == 2) {
-        filename = "cow.obj";
-    }
-    else if(x == 3) {
-        filename = "pumpkin.obj";
-    }
-    else if(x == 4) {
-        filename = "teddy.obj";
-    }
-    else if(x == 5) {
-        filename = "airplane2.obj";
-    }
-    var canvas = document.getElementById("my-canvas");
-    initGL(canvas);
-    initShaders();
-    initBuffers();
-    initScene();
-    modelLoaded = false;
-    getModelFromFile(filename);
-}
+
+
+
