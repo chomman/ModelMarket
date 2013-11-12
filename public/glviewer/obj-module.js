@@ -1,6 +1,7 @@
 var gl;
 var scene;
 var xoff = 0;
+var yoff = 0;
 var mvMatrixStack = [];
 
 var triangleVertexPositionBuffer;
@@ -27,7 +28,13 @@ function initGL(canvas) {
         alert("Could not initialise WebGL, sorry :-(  Try Chrome?");
     }
 }
-
+function onMouseWheel(event) {
+    event.preventDefault();
+    if (true) {
+      zoom += .005*event.wheelDeltaY;
+    }
+    return false;
+}
 
  function getShader(gl, id) {
     var shaderScript = document.getElementById(id);
@@ -141,9 +148,9 @@ function drawScene() {
     if(modelLoaded){
         mvPushMatrix();
         mat4.translate(mvMatrix, mvMatrix, [0, 0, 0.0]);
-        //mat4.rotate(mvMatrix, mvMatrix, 0.3*Math.sin(xoff), [1.0, 0.0, 0.0]);
-        //mat4.rotate(mvMatrix, mvMatrix, 0.4*Math.cos(2*xoff), [0.0, 0.0, 1.0]);
         mat4.rotate(mvMatrix, mvMatrix, xoff, [0.0, 1.0, 0.0]);
+
+        mat4.rotate(mvMatrix, mvMatrix, yoff, [1.0, 0.0, 0.0]);
         
         //mat4.translate(mvMatrix, mvMatrix, [0, 0, 1.0]);
         
@@ -159,16 +166,6 @@ function drawScene() {
         gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureBuffer);
         gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, modelVertexTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        /*//Textures
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, modelTexture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, modelTexture2);
-        gl.uniform1i(shaderProgram.samplerUniform2, 1);*/
-
-        //Lighting
         gl.uniform3f(
             shaderProgram.ambientColorUniform,
             0.2,
@@ -217,13 +214,12 @@ function customInvert43(matrix){
 
 function webGLStart() {
     var canvas = document.getElementById("my-canvas");
-    //canvas.width = $(window).width(); 
-    //canvas.height = $(window).height()*.9; 
     initGL(canvas);
     initShaders();
     initScene();
     initMouseGestures();
     getModelFromFile(modelURL, canvas);
+
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
@@ -235,7 +231,7 @@ function initMouseGestures() {
     var mousedown = false;
     var canvas = $('#my-canvas');
     var coord = {x:0, y:0};
-    console.log(canvas);
+    document.getElementById("my-canvas").addEventListener('mousewheel', onMouseWheel, false);
     canvas.mousedown(function(event){
         console.log(event);
         mousedown = true;
@@ -256,7 +252,8 @@ function initMouseGestures() {
             coord.y = event.offsetY;
             coord.x = event.offsetX;
             xoff += .01*xdiff;
-            zoom += .1*ydiff;
+            yoff += .01*ydiff;
+            //zoom += .1*ydiff;
             console.log("doing this");   
         }
 
@@ -349,6 +346,7 @@ function finishedModelDownload(data){
             // ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
         } else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
+            
             // ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
         } else if ( /^o /.test( line ) ) {            
             // object
@@ -555,7 +553,6 @@ function render(a){
     initShaders();
     initBuffers();
     initScene();
-    //initTexture();
     modelLoaded = false;
     getModelFromFile(filename);
 }
