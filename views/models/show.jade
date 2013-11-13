@@ -85,7 +85,8 @@ block content
             console.log("number of stars: " + data);
 
               $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
-              $("#star-holder").text(data);
+              debugger;
+              $("#star-holder span").text(data);
               starred = !starred;
             });
           }
@@ -102,13 +103,13 @@ block content
             |  Edit
       - var CLASS = logged_in ? "" : "pure-menu-disabled"
       li(class=CLASS, id="star-holder")
-
         a
           if starred
             i(id="a-star", class="fa fa-star fa-lg")
           else
             i(id="a-star", class="fa fa-star-o fa-lg")
-          |  #{model.favorites.length || 0}
+          span
+            |  #{model.favorites.length || 0}
       li
         a(href="/models/#start/edit")
           i(class="fa fa-fullscreen fa-lg")

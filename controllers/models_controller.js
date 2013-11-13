@@ -124,7 +124,6 @@ function delete_model(req, res){
 
 // models/:id/star
 function post_star(req, res){
-    console.log("upadting star ++");
     toggle_star(req, res, true);
 }
 // models/:id/unstar
