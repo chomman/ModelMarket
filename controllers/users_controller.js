@@ -5,7 +5,7 @@ var File = require('./../models/file_schema');
 var User = require('./../models/user_schema');
 var user_model = User.model;
 var Auth = require('./authentication_controller')
-
+var async = require('async');
 
 // users/register GET
 function  get_register(req, res) {
@@ -33,11 +33,25 @@ function get_show(req, res){
     User.find_by_name(req.params.username, function(err, user_result){
         if(err) console.log(err);
         if(user_result)
-        {  
-            Model3d.model.find({creator: user_result.username}).sort({views: -1}).execFind(function(err, models){
-                //console.log(results);
-                res.render('users/show', {user: user_result, models: models});
-            });
+        { 
+            async.parallel([
+                function(callback){
+                    Model3d.model.find({creator: user_result.username}).sort({views: -1}).exec(function(err, models){
+                        callback(err, models);
+                    });
+                },
+                function(callback){
+                    Model3d.model.find({favorites: user_result.username}).exec(function(err, models){
+                        callback(err, models);
+                    });
+                }
+
+                ], function(err, results){
+                    console.log(err);
+                    console.log(results);
+                    res.render('users/show', {user: user_result, models: results[0], starred: results[1]});
+                }
+            );
         }
         else res.status(404).send('Not found');
     });
