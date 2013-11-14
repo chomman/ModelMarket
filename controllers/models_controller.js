@@ -192,7 +192,7 @@ function get_model_edit(req, res){
 }
 
 function get_buy(req, res){
-    Model3d.find_by_id(req.params.id, function(obj, err){
+    Model3d.find_by_id(req.params.id, function(err, obj){
         if(err) res.render('something_broke :(');
         else res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
     });
@@ -201,6 +201,7 @@ function get_buy(req, res){
 function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey(global.keys.stripeSecretTest);
+    var res_message;
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
     var currency = req.body.currency;
@@ -216,10 +217,39 @@ function post_buy(req, res){
     }, function(err, charge) {
     if (err && err.type === 'StripeCardError') {
         console.log("ERROR");
+        console.log(err);
+    }
+    else
+    {
+        if(charge["captured"])
+        {
+            res_message = "Your payment has been successful."
+            console.log("Made charge");
+            console.log(req.params.id);
+            Model3d.find_by_id(req.params.id, function(err, obj){
+                if(err){
+                    console.log(err); 
+                    res.send('something_broke :(');
+                }
+                else res.render('models/buy', {name: obj.name,
+                                               description: obj.description,
+                                               price: obj.price,
+                                               id: obj._id,
+                                               message: res_message});
+            });
+        }
+        else
+        {
+            res_message = "Your payment has been unsuccessful."
+            console.log("No charge");
+            //res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id, message: res_message});
+        }
+        //console.log(charge);
     }
     });
-    console.log("Made charge");
-    res.send("Thanks for purchase");
+
+    
+    
 }
 
 module.exports = {

@@ -36,7 +36,7 @@ module.exports = {
 }
 module.exports.find_by_name = function(name, callback){
   db_model.findOne({name : name}, function(err,obj) {
-    if(err) callback(null ,err);
+    if(err) callback(err ,null);
     else callback(obj);
   });
 };
@@ -44,7 +44,7 @@ module.exports.find_by_name = function(name, callback){
 module.exports.find_by_id = function(id, callback){
   db_model.findOne({_id : id}, function(err,obj) {
     if(err) callback(err , null);
-    else callback(null, obj);
+    else callback(err, obj);
   });
 };
 
