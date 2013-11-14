@@ -47,17 +47,3 @@ module.exports.find_by_id = function(id, callback){
     else callback(err, obj);
   });
 };
-
-module.exports.create = function(hash, filelocation, callback){
-  var new_model3d = new db_model(hash);
-  new_model3d.save(function (err) {
-    if (err) { callback(err, null); return;}
-    console.log("no error saving model");
-    File.create({owner: new_model3d._id}, filelocation, function(err, obj){
-      if(err) { callback(err, null); return;}
-      console.log("no error creating file") 
-      new_model3d.upload = obj._id;
-      callback(err, new_model3d);
-    });
-  });
-};

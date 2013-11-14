@@ -58,16 +58,3 @@ module.exports.move = function(location, new_name, callback){
         });
      });
 }
-
-module.exports.create = function(hash, filelocation, callback){
-  console.log("hello");
-  hash['type'] = "obj";
-  //var new_filename_URI = __filename + new_model3d._id + ".obj";
-  var new_file = new db_model(hash)
-  new_file.save(
-    function (err) {
-      if (err) {callback(err, null); return;}
-
-      
-    });
-};
