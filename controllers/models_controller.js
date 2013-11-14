@@ -94,7 +94,7 @@ function get_show(req, res){
             console.log(model_obj);
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
-            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
+            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(err, file_obj_array)
             {
                 var should_show_edit = (Auth.current_user(req) === model_obj.creator);
                 console.log("show_edit: " + should_show_edit + "for user: " + Auth.current_user(req));
@@ -146,7 +146,7 @@ function toggle_star(req, res, increase){
         function(callback){
              Model3d.find_by_id(req.params.id, function(err, model_obj){
                 if(err) callback(err);
-                callback(null, model_obj);
+                callback(err, model_obj);
              });
         },
         function(model_obj, callback){
@@ -180,7 +180,7 @@ function get_model_edit(req, res){
             return;
         }
         if(Auth.current_user(req) == model_obj.creator){
-            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(file_obj_array, err)
+            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(err, file_obj_array)
             {
                 res.render("models/edit", {model: model_obj, model_URL: file_obj_array[0].location});
                 return;

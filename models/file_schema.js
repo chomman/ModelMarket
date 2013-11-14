@@ -21,23 +21,23 @@ module.exports = {
   model: db_model
 }
 module.exports.find_by_location = function(loc, callback){
-  db_model.findOne({location : loc}, function(err,obj) {
-    if(err) callback(null ,err);
-    else callback(obj);
+  db_model.findOne({location : loc}, function(err, obj) {
+    if(err) callback(err, obj);
+    else callback(err, obj);
   });
 };
 
 module.exports.find_by_id = function(id, callback){
-  db_model.findOne({_id : id}, function(err,obj) {
-    if(err) callback(null ,err);
-    else callback(obj);
+  db_model.findOne({_id : id}, function(err, obj) {
+    if(err) callback(err, obj);
+    else callback(err, obj);
   });
 };
 
 module.exports.find_all_belonging_to_model_with_type = function(model_id, type, callback){
-  db_model.find({owner : model_id}, function(err,obj) {
-    if(err) callback(null ,err);
-    else callback(obj, err);
+  db_model.find({owner : model_id}, function(err, obj) {
+    if(err) callback(err, obj);
+    else callback(err, obj);
   });
 };
 
