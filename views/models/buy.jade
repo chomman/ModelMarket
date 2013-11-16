@@ -5,7 +5,8 @@ block content
 
   p 
     | Purchase stuff will go here. For now, click below to confirm.
+    | #{message}
   div
-    form(action='buy',method='post')
-      input(type='hidden', value='#{id}')
-      input(type='submit',value='Finish',data-transition='fade', data-theme='c')
+    a(class="pure-button pure-button-primary", href="", id="down-btn", target="_blank") Download Now 
+
+      

@@ -94,7 +94,7 @@ function get_show(req, res){
             console.log(model_obj);
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
-            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(file_obj_array, err)
+            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(err, file_obj_array)
             {
                 var should_show_edit = (Auth.current_user(req) === model_obj.creator);
                 console.log("show_edit: " + should_show_edit + "for user: " + Auth.current_user(req));
@@ -146,7 +146,7 @@ function toggle_star(req, res, increase){
         function(callback){
              Model3d.find_by_id(req.params.id, function(err, model_obj){
                 if(err) callback(err);
-                callback(null, model_obj);
+                callback(err, model_obj);
              });
         },
         function(model_obj, callback){
@@ -180,7 +180,7 @@ function get_model_edit(req, res){
             return;
         }
         if(Auth.current_user(req) == model_obj.creator){
-            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(file_obj_array, err)
+            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(err, file_obj_array)
             {
                 res.render("models/edit", {model: model_obj, model_URL: file_obj_array[0].location});
                 return;
@@ -192,7 +192,7 @@ function get_model_edit(req, res){
 }
 
 function get_buy(req, res){
-    Model3d.find_by_id(req.params.id, function(obj, err){
+    Model3d.find_by_id(req.params.id, function(err, obj){
         if(err) res.render('something_broke :(');
         else res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
     });
@@ -201,6 +201,7 @@ function get_buy(req, res){
 function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey(global.keys.stripeSecretTest);
+    var res_message;
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
     var currency = req.body.currency;
@@ -216,10 +217,39 @@ function post_buy(req, res){
     }, function(err, charge) {
     if (err && err.type === 'StripeCardError') {
         console.log("ERROR");
+        console.log(err);
+    }
+    else
+    {
+        if(charge["captured"])
+        {
+            res_message = "Your payment has been successful."
+            console.log("Made charge");
+            console.log(req.params.id);
+            Model3d.find_by_id(req.params.id, function(err, obj){
+                if(err){
+                    console.log(err); 
+                    res.send('something_broke :(');
+                }
+                else res.render('models/buy', {name: obj.name,
+                                               description: obj.description,
+                                               price: obj.price,
+                                               id: obj._id,
+                                               message: res_message});
+            });
+        }
+        else
+        {
+            res_message = "Your payment has been unsuccessful."
+            console.log("No charge");
+            //res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id, message: res_message});
+        }
+        //console.log(charge);
     }
     });
-    console.log("Made charge");
-    res.send("Thanks for purchase");
+
+    
+    
 }
 
 module.exports = {
