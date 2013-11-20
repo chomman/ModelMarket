@@ -27,30 +27,38 @@ function post_register(req, res) {
     console.log(req.body.email);
     console.log(req.body.routingNumber);
     console.log(req.body.accountNumber);
-
     console.log("--------------------------");
 
-    stripe.setApiKey(global.keys.stripeSecretTest);
+    var routing_number = req.body.routingNumber;
+    var account_number = req.body.accountNumber;
+    //stripe.setApiKey(global.keys.stripeSecretTest);
     var token = stripe.tokens.create({
     bank_account: {
                     country: 'US',
-                    routing_number: req.body.routingNumber,
-                    account_number: req.body.accountNumber
+                    routing_number: routing_number,
+                    account_number: account_number
                   }
     }, function(err, token) {
         if(err){
         console.log("ERROR");
         console.log(err);
-        }  
-    });
-    console.log(token["id"]);
-
-    user_model.register(new user_model({firstname : req.body.firstname, lastname : req.body.lastname, username : req.body.username, email: req.body.email}), req.body.password, function(err, account) {
-        if (err) {
-            return res.render('users/register', { account : account });
         }
-        res.redirect('/');
+        else
+        {
+            if(token["id"] != undefined){
+                console.log(token["id"]);
+            
+
+            user_model.register(new user_model({firstname : req.body.firstname, lastname : req.body.lastname, username : req.body.username, bankToken : token ,email: req.body.email}), req.body.password, function(err, account) {
+            if (err) {
+                return res.render('users/register', { account : account });
+            }
+            res.redirect('/');
+            });
+            }   
+        }
     });
+    
 }
 
 // users/:username GET

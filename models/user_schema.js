@@ -14,6 +14,10 @@ var userSchema = new mongoose.Schema({
     type: String,
     index: true
   },
+  recipientid: {
+    type: String,
+    index: true
+  },
   email: {
     type: String,
     index: true
