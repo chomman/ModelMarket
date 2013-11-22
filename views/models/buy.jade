@@ -1,10 +1,10 @@
 extend ../layout
 block content
   p
-    | You are about to purchase #{name}. #{description}. The price of this model is #{price} USD.
+    | You have successfully purchased #{name}. #{description}. The price of this model is #{price} USD.
 
   p 
-    | Purchase stuff will go here. For now, click below to confirm.
+    | You will be billed #{price} USD + taxes. You can download the file below.
     | #{message}
   div
     a(class="pure-button pure-button-primary", href="", id="down-btn", target="_blank") Download Now 

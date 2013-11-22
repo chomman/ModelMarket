@@ -47,9 +47,14 @@ function post_register(req, res) {
         {
             if(token["id"] != undefined){
                 console.log(token["id"]);
-            
 
-            user_model.register(new user_model({firstname : req.body.firstname, lastname : req.body.lastname, username : req.body.username, bankToken : token ,email: req.body.email}), req.body.password, function(err, account) {
+            user_model.register(new user_model({firstname : req.body.firstname, 
+                                                lastname : req.body.lastname, 
+                                                username : req.body.username, 
+                                                bankToken : token["id"] ,
+                                                email: req.body.email}), 
+                                                req.body.password, 
+                                                function(err, account) {
             if (err) {
                 return res.render('users/register', { account : account });
             }

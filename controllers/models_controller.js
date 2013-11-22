@@ -231,11 +231,23 @@ function post_buy(req, res){
                     console.log(err); 
                     res.send('something_broke :(');
                 }
-                else res.render('models/buy', {name: obj.name,
+                else{
+                    console.log(obj);
+                    var creator = obj.creator;
+                    User.find_by_name(creator, function(err, user_obj){
+                        if(err){
+                            console.log(err);
+                        }
+                        else{
+                            console.log(user_obj);
+                        }
+                    });
+                    res.render('models/buy', {name: obj.name,
                                                description: obj.description,
                                                price: obj.price,
                                                id: obj._id,
                                                message: res_message});
+                    }
             });
         }
         else
