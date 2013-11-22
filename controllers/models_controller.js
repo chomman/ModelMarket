@@ -239,7 +239,50 @@ function post_buy(req, res){
                             console.log(err);
                         }
                         else{
-                            console.log(user_obj);
+                            //console.log(user_obj);
+                            //console.log(user_obj.bankToken);
+                            var b_token = stripe.tokens.retrieve(user_obj.bankToken, function(err, b_token){
+                                if(err)
+                                {
+                                    console.log(err);
+                                }
+                                else
+                                {
+                                    console.log(b_token);
+                                    stripe.recipients.create({
+                                        name: user_obj.firstname + " " + user_obj.lastname,
+                                        type: "individual",
+                                        bank_account: b_token["id"],
+                                        email: user_obj.email
+                                    }, function(err, recipient) {
+                                        if(err)
+                                        {
+                                            console.log(err);
+                                        }
+                                        else
+                                        {
+                                            console.log(recipient);
+                                            stripe.transfers.create({
+                                                amount: amount,
+                                                currency: "usd",
+                                                recipient: recipient["id"],
+                                                description: "Transfer for test@example.com"
+                                            }, function(err, transfer) {
+                                                if(err)
+                                                {
+                                                    console.log(err);
+                                                }
+                                                else
+                                                {
+                                                    console.log(transfer);
+                                                }
+
+                                            });
+                                        }
+                                    });
+                                }
+
+                            });
                         }
                     });
                     res.render('models/buy', {name: obj.name,

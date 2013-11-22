@@ -51,7 +51,7 @@ function post_register(req, res) {
             user_model.register(new user_model({firstname : req.body.firstname, 
                                                 lastname : req.body.lastname, 
                                                 username : req.body.username, 
-                                                bankToken : token["id"] ,
+                                                bankToken : token["id"],
                                                 email: req.body.email}), 
                                                 req.body.password, 
                                                 function(err, account) {
