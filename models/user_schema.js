@@ -14,7 +14,7 @@ var userSchema = new mongoose.Schema({
     type: String,
     index: true
   },
-  bankToken: {
+  recipientid: {
     type: String,
     index: true
   },

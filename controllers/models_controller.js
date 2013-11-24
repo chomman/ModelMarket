@@ -241,28 +241,15 @@ function post_buy(req, res){
                         else{
                             //console.log(user_obj);
                             //console.log(user_obj.bankToken);
-                            var b_token = stripe.tokens.retrieve(user_obj.bankToken, function(err, b_token){
+                            var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
                                 if(err)
                                 {
                                     console.log(err);
                                 }
                                 else
                                 {
-                                    console.log(b_token);
-                                    stripe.recipients.create({
-                                        name: user_obj.firstname + " " + user_obj.lastname,
-                                        type: "individual",
-                                        bank_account: b_token["id"],
-                                        email: user_obj.email
-                                    }, function(err, recipient) {
-                                        if(err)
-                                        {
-                                            console.log(err);
-                                        }
-                                        else
-                                        {
-                                            console.log(recipient);
-                                            stripe.transfers.create({
+                                    console.log(recipient);
+                                    stripe.transfers.create({
                                                 amount: amount,
                                                 currency: "usd",
                                                 recipient: recipient["id"],
@@ -276,9 +263,6 @@ function post_buy(req, res){
                                                 {
                                                     console.log(transfer);
                                                 }
-
-                                            });
-                                        }
                                     });
                                 }
 

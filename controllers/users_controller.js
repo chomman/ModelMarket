@@ -39,27 +39,47 @@ function post_register(req, res) {
                     account_number: account_number
                   }
     }, function(err, token) {
-        if(err){
-        console.log("ERROR");
-        console.log(err);
+        if(err)
+        {
+            console.log("ERROR");
+            console.log(err);
         }
         else
         {
-            if(token["id"] != undefined){
+            if(token["id"] != undefined)
+            {
                 console.log(token["id"]);
+                stripe.recipients.create({
+                                        name: req.body.firstname + " " + req.body.lastname,
+                                        type: "individual",
+                                        bank_account: token["id"],
+                                        email: req.body.email
+                }, function(err, recipient) 
+                {
+                    if(err)
+                    {
+                        console.log(err);
+                    }
+                    else
+                    {
+                        console.log(recipient);
+                        user_model.register(new user_model({firstname : req.body.firstname, 
+                                                    lastname : req.body.lastname, 
+                                                    username : req.body.username, 
+                                                    recipientid : recipient["id"],
+                                                    email: req.body.email}), 
+                                                    req.body.password, 
+                                                    function(err, account) {
+                        if (err) 
+                        {
+                            return res.render('users/register', { account : account });
+                        }
+                        res.redirect('/');
+                        });
+                    }
 
-            user_model.register(new user_model({firstname : req.body.firstname, 
-                                                lastname : req.body.lastname, 
-                                                username : req.body.username, 
-                                                bankToken : token["id"],
-                                                email: req.body.email}), 
-                                                req.body.password, 
-                                                function(err, account) {
-            if (err) {
-                return res.render('users/register', { account : account });
-            }
-            res.redirect('/');
-            });
+                });
+                
             }   
         }
     });
