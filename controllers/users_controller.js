@@ -29,6 +29,8 @@ function post_register(req, res) {
     console.log(req.body.accountNumber);
     console.log("--------------------------");
 
+    var first_name = req.body.firstname;
+    var last_name = req.body.lastname;
     var routing_number = req.body.routingNumber;
     var account_number = req.body.accountNumber;
     //stripe.setApiKey(global.keys.stripeSecretTest);
@@ -50,7 +52,7 @@ function post_register(req, res) {
             {
                 console.log(token["id"]);
                 stripe.recipients.create({
-                                        name: req.body.firstname + " " + req.body.lastname,
+                                        name: first_name + " " + last_name,
                                         type: "individual",
                                         bank_account: token["id"],
                                         email: req.body.email
@@ -63,8 +65,8 @@ function post_register(req, res) {
                     else
                     {
                         console.log(recipient);
-                        user_model.register(new user_model({firstname : req.body.firstname, 
-                                                    lastname : req.body.lastname, 
+                        user_model.register(new user_model({firstname : first_name, 
+                                                    lastname : last_name, 
                                                     username : req.body.username, 
                                                     recipientid : recipient["id"],
                                                     email: req.body.email}), 
