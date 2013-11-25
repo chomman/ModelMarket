@@ -20,20 +20,24 @@ var zoom = -8;
 /*---------------------------SHADERS---------------------------*/
 /***************************************************************/
 
-var shaderProgram;
 function getShader(gl, id) {
-    var shaderScript = document.getElementById(id);
+    var shaderScript, theSource, currentChild, shader;
+
+    shaderScript = document.getElementById(id);
+
     if (!shaderScript) {
         return null;
     }
 
-    var str = "";
-    var k = shaderScript.firstChild;
-    while (k) {
-        if (k.nodeType == 3) {
-            str += k.textContent;
+    theSource = "";
+    currentChild = shaderScript.firstChild;
+
+    while(currentChild) {
+        if (currentChild.nodeType == currentChild.TEXT_NODE) {
+            theSource += currentChild.textContent;
         }
-        k = k.nextSibling;
+
+        currentChild = currentChild.nextSibling;
     }
 
     var shader;
@@ -45,7 +49,7 @@ function getShader(gl, id) {
         return null;
     }
 
-    gl.shaderSource(shader, str);
+    gl.shaderSource(shader, theSource);
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -55,17 +59,23 @@ function getShader(gl, id) {
 
     return shader;
 }
+
+
+var shaderProgram;
 function initShaders() {
     var fragmentShader = getShader(gl, "shader-fs");
     var vertexShader = getShader(gl, "shader-vs");
 
     shaderProgram = gl.createProgram();
+    
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
+
     gl.linkProgram(shaderProgram);
 
+
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        alert("Could not initialise shaders");
+        alert("shaders not linked!");
     }
 
     gl.useProgram(shaderProgram);
@@ -75,18 +85,16 @@ function initShaders() {
 
     shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
     gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-
+/*
     shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
     gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
+    */
     shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
     shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
     shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-    shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
+
     shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
-    shaderProgram.lightingDirectionUniform = gl.getUniformLocation(shaderProgram, "uLightingDirection");
-    shaderProgram.directionalColorUniform = gl.getUniformLocation(shaderProgram, "uDirectionalColor");
-    shaderProgram.lightPosition = gl.getUniformLocation(shaderProgram, "lightPosition");
     shaderProgram.lightPositionUniform = gl.getUniformLocation(shaderProgram, "lightPosition");
 }
 
@@ -160,39 +168,19 @@ function drawScene() {
         gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexNormalBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, modelVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        //Bind Texture Face Coords
-        gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, modelVertexTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
         gl.uniform3f(
             shaderProgram.ambientColorUniform,
-            0.2,
-            0.2,
-            0.2
+            0.0,
+            0.0,
+            0.0
         );
 
-        var lightingDirection = [
-            0.3,
-            0.3,
-            0.3
-        ];
-        var adjustedLD = vec3.create();
-        vec3.normalize(adjustedLD, lightingDirection);
-        //vec3.scale(adjustedLD, -1);
-        gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
-
-        gl.uniform3f(
-            shaderProgram.directionalColorUniform,
-            .8,
-            .8,
-            .8
-        );
 
         gl.uniform3f(
             shaderProgram.lightPositionUniform,
-            6.5,
+            9.5,
             7.0,
-            -3.0
+            -40.0
         );
         
         //Bind Vertex Indicies and draw
@@ -212,13 +200,16 @@ function drawScene() {
 
 function initGL(canvas) {
     try {
-        gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        var _canvas = document.getElementById("my-canvas");
+        gl = _canvas.getContext("webgl");
         console.log("w: " + canvas.width);
         console.log("h: " + canvas.height);
         gl.viewportWidth = canvas.width;
         gl.viewportHeight = canvas.height;
     } catch (e) {
+        console.log("asdffdsa");
     }
+    //debugger;
     if (!gl) {
         alert("Could not initialise WebGL, sorry :-(  Try Chrome?");
     }
@@ -280,7 +271,7 @@ function initMouseGestures() {
 
 
 function onMouseWheel(event) {
-    event.preventDefault();
+    event.defaultPrevented = true;
     zoom += .005*event.wheelDeltaY;
 }
 
