@@ -7,6 +7,11 @@ var user_model = User.model;
 var Auth = require('./authentication_controller')
 var async = require('async');
 
+var stripe = require("stripe")(
+  "sk_test_SBwGeHO10EJ0xTnmImA0W3uC"
+);
+
+
 // users/register GET
 function  get_register(req, res) {
     res.render('users/register', { });
@@ -15,17 +20,72 @@ function  get_register(req, res) {
 // users/register POST
 function post_register(req, res) {
     console.log("--------new user----------");
+    console.log(req.body.firstname);
+    console.log(req.body.lastname);
     console.log(req.body.username);
     console.log(req.body.password);
-    console.log(req.body.email)
+    console.log(req.body.email);
+    console.log(req.body.routingNumber);
+    console.log(req.body.accountNumber);
     console.log("--------------------------");
 
-    user_model.register(new user_model({ username : req.body.username, email: req.body.email}), req.body.password, function(err, account) {
-        if (err) {
-            return res.render('users/register', { account : account });
+    var first_name = req.body.firstname;
+    var last_name = req.body.lastname;
+    var routing_number = req.body.routingNumber;
+    var account_number = req.body.accountNumber;
+    //stripe.setApiKey(global.keys.stripeSecretTest);
+    var token = stripe.tokens.create({
+    bank_account: {
+                    country: 'US',
+                    routing_number: routing_number,
+                    account_number: account_number
+                  }
+    }, function(err, token) {
+        if(err)
+        {
+            console.log("ERROR");
+            console.log(err);
         }
-        res.redirect('/');
+        else
+        {
+            if(token["id"] != undefined)
+            {
+                console.log(token["id"]);
+                stripe.recipients.create({
+                                        name: first_name + " " + last_name,
+                                        type: "individual",
+                                        bank_account: token["id"],
+                                        email: req.body.email
+                }, function(err, recipient) 
+                {
+                    if(err)
+                    {
+                        console.log(err);
+                    }
+                    else
+                    {
+                        console.log(recipient);
+                        user_model.register(new user_model({firstname : first_name, 
+                                                    lastname : last_name, 
+                                                    username : req.body.username, 
+                                                    recipientid : recipient["id"],
+                                                    email: req.body.email}), 
+                                                    req.body.password, 
+                                                    function(err, account) {
+                        if (err) 
+                        {
+                            return res.render('users/register', { account : account });
+                        }
+                        res.redirect('/');
+                        });
+                    }
+
+                });
+                
+            }   
+        }
     });
+    
 }
 
 // users/:username GET
