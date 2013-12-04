@@ -271,7 +271,7 @@ function initMouseGestures() {
 
 
 function onMouseWheel(event) {
-    event.defaultPrevented = true;
+    event.preventDefault();
     zoom += .005*event.wheelDeltaY;
 }
 
