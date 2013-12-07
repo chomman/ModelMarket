@@ -1,9 +1,6 @@
 // Models Controller
 // * * * * * * * * * * 
-var Model3d = require('./../models/model3d_schema');
-var File = require('./../models/file_schema');
-var User = require('./../models/user_schema');
-var Auth = require('./authentication_controller');
+var Model3d = require('./../models/model3d_schema'); var File = require('./../models/file_schema'); var User = require('./../models/user_schema'); var Auth = require('./authentication_controller');
 
 var stripe = require("stripe")(
   "sk_test_SBwGeHO10EJ0xTnmImA0W3uC"
@@ -15,8 +12,9 @@ var async = require('async');
 function get_new(req, res){
     if(Auth.current_user(req) != null){
         res.render('models/new', {selected: "upload"});
-    }else
+    }else {
         res.redirect('/login');
+    }
 
 }
 

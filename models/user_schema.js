@@ -2,37 +2,37 @@ var mongoose = require('mongoose');
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var userSchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    index: true
-  },
-  lastname: {
-    type: String,
-    index: true
-  },
-  username: {
-    type: String,
-    index: true
-  },
-  recipientid: {
-    type: String,
-    index: true
-  },
-  email: {
-    type: String,
-    index: true
-  },
-  blurb: {
-    type: String,
-    index: false
-  },
-  location: {
-    type: String,
-    index: false
-  },
-  uploads: Array,
-  purchases: Array,
-  favorites: Array
+        firstname: {
+            type: String,
+            index: true
+        },
+        lastname: {
+            type: String,
+            index: true
+        },
+        username: {
+            type: String,
+            index: true
+        },
+        recipientid: {
+            type: String,
+            index: true
+        },
+        email: {
+            type: String,
+            index: true
+        },
+        blurb: {
+            type: String,
+            index: false
+        },
+        location: {
+            type: String,
+            index: false
+        },
+        uploads: Array,
+        purchases: Array,
+        favorites: Array
 });
 
 userSchema.plugin(passportLocalMongoose);
