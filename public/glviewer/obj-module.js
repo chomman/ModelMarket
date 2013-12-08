@@ -504,6 +504,7 @@ function getModelFromFile(modelURL){
             }
         });
     })($);
+    console.log("getting file from url: " + modelURL);
     $.ajax({
         url: modelURL,
         type: "GET",
