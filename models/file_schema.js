@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var fs = require('fs'); 
 
 var Grid = require("gridfs-stream");
-var db = mongoose.connection;
 Grid.mongo = mongoose.mongo;
 
 var conn = mongoose.createConnection('mongodb://localhost/mmdb');
@@ -18,6 +17,9 @@ var fileSchema = new mongoose.Schema({
         file_type: {
             type: String
         },
+        gridfs_id : {
+            type: mongoose.Schema.Types.ObjectId
+        },
         owner: {
             type: mongoose.Schema.Types.ObjectId,
             index: true
@@ -29,8 +31,8 @@ var db_model = mongoose.model('File', fileSchema);
 module.exports = {
     model: db_model
 };
+
 module.exports.find_by_location = function(loc, callback){
-    "use strict";
     db_model.findOne({location : loc}, function(err, obj) {
         if(err) { 
             callback(err, obj);
@@ -42,7 +44,6 @@ module.exports.find_by_location = function(loc, callback){
 };
 
 module.exports.find_by_id = function(id, callback){
-    "use strict";
     db_model.findOne({_id : id}, function(err, obj) {
         if(err)  {
             callback(err, obj);
@@ -54,10 +55,13 @@ module.exports.find_by_id = function(id, callback){
 };
 
 module.exports.find_all_belonging_to_model_with_type = function(model_id, type, callback){
-    "use strict";
     db_model.find({owner : model_id}, function(err, obj) {
-        if(err) callback(err, obj);
-        else callback(err, obj);
+        if(err) {
+            callback(err, obj);
+        }
+        else {
+            callback(err, obj);
+        }
     });
 };
 
@@ -68,9 +72,8 @@ module.exports.find_all_belonging_to_model_with_type = function(model_id, type, 
  @callback: callback(err) that takes an error as a parameter
 
  ---------------------------------------------------------------- */
-module.exports.move = function(locationOnDisk, new_name, callback){
-    "use strict";
-    putFileIntoDatabase(locationOnDisk);
+module.exports.move = function(new_file, locationOnDisk, new_name, callback){
+    putFileIntoDatabase(new_file, locationOnDisk);
     fs.readFile(locationOnDisk, function (err, data) {
         console.log("yo");
         var newPath = global.root_path + "/public/uploads/" + new_name;
@@ -81,25 +84,35 @@ module.exports.move = function(locationOnDisk, new_name, callback){
     });
 };
 
-function putFileIntoDatabase(locationOnDisk) {
+function putFileIntoDatabase(new_file, locationOnDisk) {
     //var buffer = "";
 
     var gridfs = Grid(conn.db);
-    
+   
     // write file
     var writeStream = gridfs.createWriteStream({ filename: locationOnDisk });
     console.log("reached putFileIntoDatabase");
     fs.createReadStream(locationOnDisk).pipe(writeStream);
 
     // after the write is finished
-    writeStream.on("close", function () {
+    writeStream.on("close", function (file) {
+        console.log("file : " + file);
+        try {
+            new_file.gridfs_id = file._id;
+            console.log("file id : " + new_file.gridfs_id); 
+        }
+        catch(err) {
+            console.log("file id error");
+        }
         console.log("write file finished");
+        /*
         gridfs.files.find({ filename: locationOnDisk }).toArray(function (err, files) {
             if (err) {
                 console.log(err);
-            }
+            } 
             console.log(files);
 
-        });
+    });
+        */
     });
 }

@@ -1,6 +1,17 @@
 // Models Controller
 // * * * * * * * * * * 
-var Model3d = require('./../models/model3d_schema'); var File = require('./../models/file_schema'); var User = require('./../models/user_schema'); var Auth = require('./authentication_controller');
+var Model3d = require('./../models/model3d_schema'); 
+var File = require('./../models/file_schema'); 
+var User = require('./../models/user_schema'); 
+var Auth = require('./authentication_controller');
+
+var Grid = require("gridfs-stream");
+var mongoose = require('mongoose');
+Grid.mongo = mongoose.mongo;
+
+var conn = mongoose.createConnection('mongodb://localhost/mmdb');
+
+conn.on('error', console.error.bind(console, 'connection error:'));
 
 var stripe = require("stripe")(
   "sk_test_SBwGeHO10EJ0xTnmImA0W3uC"
@@ -10,16 +21,17 @@ var async = require('async');
 
 // models/new GET
 function get_new(req, res){
-    if(Auth.current_user(req) != null){
+    "use strict";
+    if(Auth.current_user(req) != null) {
         res.render('models/new', {selected: "upload"});
     }else {
         res.redirect('/login');
     }
-
 }
 
 // models/new POST
 function post_new(req, res){
+    "use strict";
     console.log(req.body);
     console.log(req.files.model.path);
     console.log(Auth.current_user(req));
@@ -35,8 +47,8 @@ function post_new(req, res){
 
     /*  This shit shoud probably be done in the file_schema module */
 
-    var obj_file_name = new_model3d.id + "_" + new_file.id + ".obj"
-    var obj_file_type = "OBJ"
+    var obj_file_name = new_model3d.id + "_" + new_file.id + ".obj";
+    var obj_file_type = "OBJ";
 
     new_file.location = obj_file_name;
     new_file.type = obj_file_type;
@@ -44,7 +56,7 @@ function post_new(req, res){
     //Do all 3 of these tasks in parallel asyncronously and then meetup at the end
     async.parallel([
         function(callback){
-            File.move(req.files.model.path, obj_file_name, function(err){
+            File.move(new_file, req.files.model.path, obj_file_name, function(err){
                 if(err)
                 {
                     console.log("There was an error moving the file to uploads");
@@ -53,6 +65,11 @@ function post_new(req, res){
                 }
                 else
                 {
+                    new_file.save(function (err, product, numberAffected) {
+                        if(err){
+                            console.log("There was an error saving the file to the db! \n" + err);
+                        }
+                    });
                     console.log("File saved!");
                     callback(null, null); 
                 } 
@@ -63,19 +80,12 @@ function post_new(req, res){
                 if(err){
                     console.log("There was an error saving the model3d to the db! \n" + err);
                     callback(err);
-                }else
+                }
+                else {
                     callback(null, product);
+                }
             });
-        },
-        function(callback){
-            new_file.save(function (err, product, numberAffected) {
-                if(err){
-                    console.log("There was an error saving the file to the db! \n" + err);
-                    callback(err);
-                }else
-                    callback(null, product);
-            });
-        }   
+        }
     ], function (err, results){
         console.log(results);
         console.log("new model id: " + new_model3d.id);
@@ -289,6 +299,16 @@ function post_buy(req, res){
     
 }
 
+function get_file(req, res) {
+    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        File.find_by_id(model_obj.upload, function(err, file){ 
+            var gridfs = Grid(conn.db);
+            var readstream = gfs.createReadStream(file.gridfs_id);
+            readstream.pipe(res);
+        });
+    });
+}
+
 module.exports = {
     get_new: get_new,
     post_new: post_new,
@@ -296,6 +316,7 @@ module.exports = {
     del: delete_model,
     get_edit: get_model_edit,
     get_buy: get_buy,
+    get_file: get_file,
     post_buy: post_buy,
     post_star: post_star,
     post_unstar: post_unstar
