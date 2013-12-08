@@ -263,7 +263,6 @@ function initMouseGestures() {
             xoff += .01*xdiff;
             yoff += .01*ydiff;
             //zoom += .1*ydiff;
-            console.log("doing this");   
         }
 
     });
