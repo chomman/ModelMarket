@@ -45,7 +45,7 @@ module.exports.find_by_location = function(loc, callback){
 
 module.exports.find_by_id = function(id, callback){
     db_model.findOne({_id : id}, function(err, obj) {
-        if(err)  {
+        if(err) {
             callback(err, obj);
         }
         else {
@@ -73,18 +73,19 @@ module.exports.find_all_belonging_to_model_with_type = function(model_id, type, 
 
  ---------------------------------------------------------------- */
 module.exports.move = function(new_file, locationOnDisk, new_name, callback){
-    putFileIntoDatabase(new_file, locationOnDisk);
-    fs.readFile(locationOnDisk, function (err, data) {
-        console.log("yo");
-        var newPath = global.root_path + "/public/uploads/" + new_name;
-        console.log(newPath);
-        fs.writeFile(newPath, data, function (err) {
-            callback(err);
+    putFileIntoDatabase(new_file, locationOnDisk, function() {
+        fs.readFile(locationOnDisk, function (err, data) {
+            console.log("yo");
+            var newPath = global.root_path + "/public/uploads/" + new_name;
+            console.log(newPath);
+            fs.writeFile(newPath, data, function (err) {
+                callback(err);
+            });
         });
     });
 };
 
-function putFileIntoDatabase(new_file, locationOnDisk) {
+function putFileIntoDatabase(new_file, locationOnDisk, callback) {
     //var buffer = "";
 
     var gridfs = Grid(conn.db);
@@ -100,19 +101,21 @@ function putFileIntoDatabase(new_file, locationOnDisk) {
         try {
             new_file.gridfs_id = file._id;
             console.log("file id : " + new_file.gridfs_id); 
+            gridfs.files.find({ filename: locationOnDisk }).toArray(function (err, files) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    console.log(files);
+                }
+            });
+      
+
         }
         catch(err) {
             console.log("file id error");
         }
         console.log("write file finished");
-        /*
-        gridfs.files.find({ filename: locationOnDisk }).toArray(function (err, files) {
-            if (err) {
-                console.log(err);
-            } 
-            console.log(files);
-
-    });
-        */
+        callback();
     });
 }

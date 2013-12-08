@@ -44,6 +44,7 @@ function post_new(req, res){
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
     var new_file = new File.model({owner: new_model3d.id});
+    new_model3d.upload = new_file._id;
 
     /*  This shit shoud probably be done in the file_schema module */
 
@@ -294,16 +295,19 @@ function post_buy(req, res){
         //console.log(charge);
     }
     });
-
-    
     
 }
 
 function get_file(req, res) {
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        console.log(model_obj);
         File.find_by_id(model_obj.upload, function(err, file){ 
+            console.log(file);
             var gridfs = Grid(conn.db);
-            var readstream = gfs.createReadStream(file.gridfs_id);
+
+            var readstream = gridfs.createReadStream({_id : file.gridfs_id});
+            console.log("readstream : " + readstream);
+            res.header('Content-Type', 'plain/text');
             readstream.pipe(res);
         });
     });
