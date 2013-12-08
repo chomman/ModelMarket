@@ -386,9 +386,11 @@ function finishedModelDownload(data){
         } else if ( /^s /.test( line ) ) {
             // smooth shading
         } else {
+            console.log(line);
            // console.log( "THREE.OBJLoader: Unhandled line " + line );
         }
     }
+    console.log(scene.vertices.length);
     console.log(scene.faces.length);
     for(var i = 0; i < scene.faces.length; i++){
         var currFace = scene.faces[i];

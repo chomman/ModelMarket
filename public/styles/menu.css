@@ -280,3 +280,7 @@ a:hover{
     height: 5px;
     background-color: blue;
 }
+
+.pure-button-error {
+    background: rgb(202, 60, 60); /* this is a maroon */
+}
