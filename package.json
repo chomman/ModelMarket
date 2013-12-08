@@ -11,6 +11,7 @@
     "passport-local": "",
     "passport-local-mongoose": "",
     "async": "",
-    "stripe": ""
+    "stripe": "",
+    "gridfs-stream": ""
   }
 }
