@@ -128,7 +128,23 @@ function get_show(req, res){
 
 // models/:id DELETE
 function delete_model(req, res){
-    res.send("deleting model");
+    Model3d.find_by_id(req.params.id, function(err, model_obj){
+        //taruns code here. Delete(model_obj.upload) make a callback to call the code below.
+        console.log("delete model: " + model_obj._id);
+        model_obj.remove();
+        User.find_by_name(model_obj.creator, function(err, user){
+            if(err){
+                console.log(err);
+            }
+            else{
+                var index = user.uploads.indexOf(model_obj._id);
+                if(index != -1){
+                   user.uploads.splice(index, 1); 
+                }
+                user.save();
+            }
+        });
+    });
 }
 
 // models/:id/star

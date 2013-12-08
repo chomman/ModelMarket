@@ -43,11 +43,11 @@ module.exports.find_by_name = function(name, callback){
         if(err) callback(err ,null);
         else callback(err,obj);
     });
-    };
+  };
 
-    module.exports.find_by_id = function(id, callback){
-        db_model.findOne({_id : id}, function(err,obj) {
-            if(err) callback(err , null);
-            else callback(err, obj);
-        });
-        };
+module.exports.find_by_id = function(id, callback){
+    db_model.findOne({_id : id}, function(err,obj) {
+        if(err) callback(err , null);
+        else callback(err, obj);
+    });
+  };

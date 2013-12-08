@@ -32,7 +32,6 @@ var userSchema = new mongoose.Schema({
         },
         uploads: Array,
         purchases: Array,
-        favorites: Array
 });
 
 userSchema.plugin(passportLocalMongoose);
