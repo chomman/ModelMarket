@@ -23,10 +23,6 @@ var modelSchema = new mongoose.Schema({
     required: true
   },
   favorites: Array,
-  upload: {
-    type: mongoose.Schema.Types.ObjectId,
-    index: false
-  },
   public: {
       type: Boolean,
       default: false
