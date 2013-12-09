@@ -1,3 +1,4 @@
+"use strict"
 // Navigation Controller
 // * * * * * * * * * * 
 var Model3d = require('./../models/model3d_schema');
@@ -17,14 +18,28 @@ function home(req, res){
 TODO: 
 */
 function search(req, res){
-    
+    res.render('navigation/search_bar', {selected: "search" });
 }
 
 function about(req, res){
     res.render('about', {selected: "about"});
 }
 
+function post_search(req, res) {
+    console.log(req.body);
+    Model3d.find_by_string(req.body.search_bar, function(err, docs) {
+        if (err) {
+            res.send("something went wrong");
+        }
+        else {
+            res.render('navigation/search', {models: docs, selected: "Search Results" });
+        }
+    });
+}
+
 module.exports = {
     get_home: home,
-    get_about: about
-}
+    get_about: about,
+    get_search: search,
+    post_search: post_search
+};

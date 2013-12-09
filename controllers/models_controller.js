@@ -44,9 +44,8 @@ function post_new(req, res){
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
     var new_file = new File.model({owner: new_model3d.id});
-    new_model3d.upload = new_file._id;
 
-    /*  This shit shoud probably be done in the file_schema module */
+    /*  This shit should probably be done in the file_schema module */
 
     var obj_file_name = new_model3d.id + "_" + new_file.id + ".obj";
     var obj_file_type = "OBJ";
@@ -70,9 +69,11 @@ function post_new(req, res){
                         if(err){
                             console.log("There was an error saving the file to the db! \n" + err);
                         }
+                        else {
+                            console.log("File saved!");
+                            callback(null, null); 
+                        }
                     });
-                    console.log("File saved!");
-                    callback(null, null); 
                 } 
             });
         },
@@ -317,16 +318,18 @@ function post_buy(req, res){
 }
 
 function get_file(req, res) {
+    var gridfs = Grid(conn.db);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        console.log(model_obj);
-        File.find_by_id(model_obj.upload, function(err, file){ 
-            console.log(file);
-            var gridfs = Grid(conn.db);
+        File.model.find({owner : model_obj._id}, function(err, files){ 
+            for (var index in files) {
+                var file = files[index];
+                console.log(file);
 
-            var readstream = gridfs.createReadStream({_id : file.gridfs_id});
-            console.log("readstream : " + readstream);
-            res.header('Content-Type', 'plain/text');
-            readstream.pipe(res);
+                var readstream = gridfs.createReadStream({_id : file.gridfs_id});
+                console.log("readstream : " + readstream);
+                res.header('Content-Type', 'plain/text');
+                readstream.pipe(res);
+            }
         });
     });
 }

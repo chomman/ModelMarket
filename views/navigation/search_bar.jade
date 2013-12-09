@@ -1,0 +1,8 @@
+extend ../layout
+include ../mixins
+
+block content
+    |Search: 
+    form(action="/search", method="post")
+        input(type="text", name="search_bar")
+        input(type="submit", value="Submit")

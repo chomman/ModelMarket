@@ -82,6 +82,8 @@ fs.readFile(keysfile, 'utf8', function (err, data) {
 // #Routes
 app.get('/', navigation_controller.get_home);
 app.get('/about', navigation_controller.get_about);
+app.get('/search', navigation_controller.get_search);
+app.post('/search', navigation_controller.post_search);
 
 
 app.get('/models/new', models_controller.get_new);

@@ -1,3 +1,4 @@
+"use strict"
 var mongoose = require('mongoose');
 
 var File = require('./file_schema');
@@ -47,3 +48,12 @@ module.exports.find_by_id = function(id, callback){
         else callback(err, obj);
     });
   };
+
+module.exports.find_by_string = (function(query, callback) {
+    var tokens = query.split();
+    var re = new RegExp(query);
+    db_model.find({name: re}, function(err, docs) {
+        if(err) callback(err , null);
+        else callback(err, docs);
+    });
+});
