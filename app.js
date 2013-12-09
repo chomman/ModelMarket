@@ -83,6 +83,7 @@ fs.readFile(keysfile, 'utf8', function (err, data) {
 app.get('/', navigation_controller.get_home);
 app.get('/about', navigation_controller.get_about);
 
+
 app.get('/models/new', models_controller.get_new);
 app.post('/models/new', models_controller.post_new);
 app.get('/models/:id', models_controller.show);
@@ -92,6 +93,7 @@ app.get('/models/:id/buy',  models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
 app.post('/models/:id/star', models_controller.post_star);
 app.post('/models/:id/unstar', models_controller.post_unstar);
+app.get('/models/uploads/:id', models_controller.get_file);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
