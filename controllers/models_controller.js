@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 // Models Controller
 // * * * * * * * * * * 
 var Model3d = require('./../models/model3d_schema'); 
@@ -21,7 +23,6 @@ var async = require('async');
 
 // models/new GET
 function get_new(req, res){
-    "use strict";
     if(Auth.current_user(req) != null) {
         res.render('models/new', {selected: "upload"});
     }else {
@@ -31,7 +32,6 @@ function get_new(req, res){
 
 // models/new POST
 function post_new(req, res){
-    "use strict";
     console.log(req.body);
     console.log(req.files.model.path);
     console.log(Auth.current_user(req));
@@ -130,7 +130,9 @@ function get_show(req, res){
 function delete_model(req, res){
     Model3d.find_by_id(req.params.id, function(err, model_obj){
         //taruns code here. Delete(model_obj.upload) make a callback to call the code below.
-        console.log("delete model: " + model_obj._id);
+        console.log(model_obj);
+        File.delete_file(model_obj._id);
+        
         model_obj.remove();
         User.find_by_name(model_obj.creator, function(err, user){
             if(err){

@@ -37,7 +37,7 @@ var db_model = mongoose.model('Model3d', modelSchema);
 
 module.exports = {
     model: db_model
-}
+};
 module.exports.find_by_name = function(name, callback){
     db_model.findOne({name : name}, function(err,obj) {
         if(err) callback(err ,null);

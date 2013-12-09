@@ -2,6 +2,8 @@
 "use strict";
 var mongoose = require('mongoose');
 var fs = require('fs'); 
+var Model3d = require('./../models/model3d_schema'); 
+var File = require('./../models/file_schema'); 
 
 var Grid = require("gridfs-stream");
 Grid.mongo = mongoose.mongo;
@@ -29,7 +31,8 @@ var fileSchema = new mongoose.Schema({
 var db_model = mongoose.model('File', fileSchema);
 
 module.exports = {
-    model: db_model
+    model: db_model,
+    delete_file: delete_file
 };
 
 module.exports.find_by_location = function(loc, callback){
@@ -85,33 +88,38 @@ module.exports.move = function(new_file, locationOnDisk, new_name, callback){
     });
 };
 
-function putFileIntoDatabase(new_file, locationOnDisk, callback) {
-    //var buffer = "";
+function delete_file(model_id) {
+    var gridfs = Grid(conn.db);
+    db_model.find({owner : model_id}, function(err, files) {
+        for (var index in files) {
+            console.log("reached here");
+            var file = files[index];
+            console.log(file);
+            gridfs.remove({_id : file.gridfs_id}, function() {
+                if (err) {
+                    console.log(err);
+                }
+                console.log('success');
+                file.remove();
+            });
+        }
+    });
+}
 
+
+function putFileIntoDatabase(new_file, locationOnDisk, callback) {
     var gridfs = Grid(conn.db);
    
-    // write file
     var writeStream = gridfs.createWriteStream({ filename: locationOnDisk });
     console.log("reached putFileIntoDatabase");
     fs.createReadStream(locationOnDisk).pipe(writeStream);
 
-    // after the write is finished
     writeStream.on("close", function (file) {
         console.log("file : " + file);
         try {
             new_file.gridfs_id = file._id;
-            console.log("file id : " + new_file.gridfs_id); 
-            gridfs.files.find({ filename: locationOnDisk }).toArray(function (err, files) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log(files);
-                }
-            });
-      
-
         }
+        
         catch(err) {
             console.log("file id error");
         }

@@ -542,6 +542,3 @@ function face(_v1, _v2, _v3){
         this.normal = normal;
     }
 }
-
-
-
