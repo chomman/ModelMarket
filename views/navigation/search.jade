@@ -3,6 +3,6 @@ include ../mixins
 
 block content
     div
-        h2 Models in the database right now: 
+        h2 Models matching your search: 
         -each m in models
             mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
