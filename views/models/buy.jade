@@ -7,8 +7,7 @@ block content
         | You will be billed #{price} USD + taxes. You can download the file below.
         | #{message}
     div
-        a(class="pure-button pure-button-primary", href="", id="down-btn", action="models/uploads/#{id}") Download Now 
         form(method="get", action="/models/uploads/#{id}")
-            button(type="submit")
+            button(class="pure-button pure-button-primary", type="submit")
                 |Download
       
