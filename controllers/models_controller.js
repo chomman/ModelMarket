@@ -43,16 +43,7 @@ function post_new(req, res){
                                         });
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
-    var new_file = new File.model({owner: new_model3d.id});
-
     /*  This shit should probably be done in the file_schema module */
-
-    var obj_file_name = new_model3d.id + "_" + new_file.id + ".obj";
-    var obj_file_type = "OBJ";
-
-    new_file.location = obj_file_name;
-    new_file.type = obj_file_type;
-
 
     File.put_file_into_database(req.files.model.path, function(err, gridfs_id){
         if(err)
