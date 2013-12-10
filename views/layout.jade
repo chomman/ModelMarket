@@ -6,6 +6,7 @@ html
     //link(rel="stylesheet", href="/styles/style.css")
     link(rel="stylesheet", href="/styles/menu.css")
     link(href="/vendor/font-awesome-4.0.1/css/font-awesome.css" rel="stylesheet")
+      
   body
     #layout.pure-g-r 
       #menu.pure-u
@@ -25,7 +26,7 @@ html
             
             if (passport.user)
               div.login-container
-                img.profile-picture(src='/users/#{passport.user}/image')
+                div.circular(style="background: url(/users/#{passport.user}/image); background-size: cover;")
                 li.user-link
                   a(href="/users/#{passport.user}") #{passport.user}
                 li

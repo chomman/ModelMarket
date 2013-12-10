@@ -284,3 +284,16 @@ a:hover{
 .pure-button-error {
     background: rgb(202, 60, 60); /* this is a maroon */
 }
+
+.circular {
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    border-radius: 150px;
+    background-size: auto;
+    -webkit-border-radius: 70px;
+    -moz-border-radius: 70px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
