@@ -1,92 +1,92 @@
 extend ../layout
 block content
-  script(src="/vendor/gl-matrix2.js")
-  script(src="/vendor/webgl-utils.js")
-  script(src="/vendor/jquery-2.js")
+    script(src="/vendor/gl-matrix2.js")
+    script(src="/vendor/webgl-utils.js")
+    script(src="/vendor/jquery-2.js")
 
-  script(src="/glviewer/obj-module.js")
-  script(src="https://checkout.stripe.com/v2/checkout.js")
+    script(src="/glviewer/obj-module.js")
+    script(src="https://checkout.stripe.com/v2/checkout.js")
 
-  include shaders
+    include shaders
 
-  script.
-    var modelURL = "/models/uploads/" + '#{model._id}';
-    var starred = #{starred};
-    var loggedIn = #{logged_in}
-    $( document ).ready( function(){
-      webGLStart(); 
-      $("#a-star").click(function() {
-        if(loggedIn){
-          console.log($(this));
-          $( this ).removeClass("fa-star-o fa-star").addClass("fa-spinner fa-spin")
-          console.log("a was clicked"); // or alert("click");
-        
-          $.post(starred ? "/models/#{model._id}/unstar" : "/models/#{model._id}/star", function(data){
-            console.log("number of stars: " + data);
+    script.
+        var modelURL = "/models/uploads/" + '#{model._id}';
+        var starred = #{starred};
+        var loggedIn = #{logged_in}
+        $( document ).ready( function(){
+            webGLStart(); 
+            $("#a-star").click(function() {
+                if(loggedIn){
+                    console.log($(this));
+                    $( this ).removeClass("fa-star-o fa-star").addClass("fa-spinner fa-spin")
+                    console.log("a was clicked"); // or alert("click");
+            
+                    $.post(starred ? "/models/#{model._id}/unstar" : "/models/#{model._id}/star", function(data){
+                        console.log("number of stars: " + data);
 
-              $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
-              debugger;
-              $("#star-holder span").text(data);
-              starred = !starred;
+                        $( "#a-star" ).removeClass("fa-spinner fa-spin").addClass(starred ? "fa-star-o" : "fa-star")
+                        debugger;
+                        $("#star-holder span").text(data);
+                        starred = !starred;
+                    });
+                }
             });
-          }
-      });
-    });
+        });
 
-  h1.show-header #{model.name}
-  div.pure-menu.pure-menu-open.pure-menu-horizontal
-    ul.show-gl-menu
-      if show_edit
-        li
-          a(href="/models/#{model._id}/edit")
-            i(class="fa fa-pencil fa-lg")
-            |  Edit
-      - var CLASS = logged_in ? "" : "pure-menu-disabled"
-      li(class=CLASS, id="star-holder")
-        a
-          if starred
-            i(id="a-star", class="fa fa-star fa-lg")
-          else
-            i(id="a-star", class="fa fa-star-o fa-lg")
-          span
-            |  #{model.favorites.length || 0}
-      li
-        a(href="#", onclick="goFullScreen()")
-          i(class="fa fa-fullscreen fa-lg")
-          |  Full Screen
+    h1.show-header #{model.name}
+    div.pure-menu.pure-menu-open.pure-menu-horizontal
+        ul.show-gl-menu
+            if show_edit
+                li
+                    a(href="/models/#{model._id}/edit")
+                        i(class="fa fa-pencil fa-lg")
+                        |  Edit
+            - var CLASS = logged_in ? "" : "pure-menu-disabled"
+            li(class=CLASS, id="star-holder")
+                a
+                    if starred
+                        i(id="a-star", class="fa fa-star fa-lg")
+                    else
+                        i(id="a-star", class="fa fa-star-o fa-lg")
+                    span
+                        |  #{model.favorites.length || 0}
+            li
+                a(href="#", onclick="goFullScreen()")
+                    i(class="fa fa-fullscreen fa-lg")
+                    |  Full Screen
         
-  div.loader(id="loaderbar")
-  canvas.gl-player.model-canvas(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  div.model-description
-    p
-      | #{model.description}
-    p 
-      | by 
-      a(href='/users/#{model.creator}') #{model.creator}
-    form(action="/models/#{model._id}/buy" method="post")
-      div
-        a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
-        script.
-          $('#buy-btn').click(function(){
-            var token = function(res){
-              var $sToken = $('<input type=hidden name=stripeToken />').val(res.id);
-              var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
-              $('form').append($sToken, $amount).submit();
-            };
+    div.loader(id="loaderbar")
+    canvas.gl-player.model-canvas(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
+    div.model-description
+        p
+            | #{model.description}
+        p 
+            | by 
+            a(href='/users/#{model.creator}') #{model.creator}
+        form(action="/models/#{model._id}/buy" method="post")
+            div
+                a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
+                script.
+                    $('#buy-btn').click(function(){
+                        var token = function(res){
+                            var $sToken = $('<input type=hidden name=stripeToken />').val(res.id);
+                            var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
+                            $('form').append($sToken, $amount).submit();
+                        };
 
-            StripeCheckout.open({
-              key:         '#{keys.stripePublishTest}',
-              address:     false,
-              amount:      #{model.price*100},
-              currency:    'usd',
-              name:        '#{model.name}',
-              description: 'Download rights',
-              panelLabel:  'Checkout',
-              image:       'http://placehold.it/128x128',
-              token:       token
-            });
+                        StripeCheckout.open({
+                          key:         '#{keys.stripePublishTest}',
+                          address:     false,
+                          amount:      #{model.price*100},
+                          currency:    'usd',
+                          name:        '#{model.name}',
+                          description: 'Download rights',
+                          panelLabel:  'Checkout',
+                          image:       'http://placehold.it/128x128',
+                          token:       token
+                        });
 
-            return false;
-          });
-    div
-      | views: #{model.views}
+                        return false;
+                    });
+        div
+            | views: #{model.views}

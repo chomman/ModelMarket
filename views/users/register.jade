@@ -1,16 +1,16 @@
 extends ../layout
 
 block content
-  div.register-form
-    form.pure-form.pure-form-aligned(action="/users/register",method="post")
-      div.pure-control-group
-        label(for="username") Username
-        input(type="text", id='username', name="username", placeholder="Username")
-      div.pure-control-group
-        label(for="name") Password
-        input(type="password",name="password", placeholder="Password")
-      div.pure-control-group
-        label(for="email") Email Address
-        input(id="email",type="email",name="email", placeholder="Email Address")
-      div
-        button.pure-button.pure-button-primary(type="submit") Register
+    div.register-form
+        form.pure-form.pure-form-aligned(action="/users/register",method="post")
+            div.pure-control-group
+                label(for="username") Username
+                input(type="text", id='username', name="username", placeholder="Username")
+            div.pure-control-group
+                label(for="name") Password
+                input(type="password",name="password", placeholder="Password")
+            div.pure-control-group
+                label(for="email") Email Address
+                input(id="email",type="email",name="email", placeholder="Email Address")
+            div
+                button.pure-button.pure-button-primary(type="submit") Register

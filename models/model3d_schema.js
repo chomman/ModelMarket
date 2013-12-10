@@ -4,35 +4,35 @@ var mongoose = require('mongoose');
 var File = require('./file_schema');
 
 var modelSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    index: true
-  },
-  description: {
-    type: String,
-    index: false
-  },
-  price: Number,
-  views: {
-    type: Number,
-    required: true,
-    default: 0
-  },
-  creator: {
-    type: String,
-    index: true,
-    required: true
-  },
-  favorites: Array,
-  grid_files: Array,
-  grid_display:{
-    type:  mongoose.Schema.Types.ObjectId,
-    index: false
-  },
-  public: {
-      type: Boolean,
-      default: false
-  }
+    name: {
+        type: String,
+        index: true
+    },
+    description: {
+        type: String,
+        index: false
+    },
+    price: Number,
+    views: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    creator: {
+        type: String,
+        index: true,
+        required: true
+    },
+    favorites: Array,
+    grid_files: Array,
+    grid_display:{
+        type:  mongoose.Schema.Types.ObjectId,
+        index: false
+    },
+    public: {
+        type: Boolean,
+        default: false
+    }
 });
 
 var db_model = mongoose.model('Model3d', modelSchema);

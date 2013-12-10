@@ -1,48 +1,48 @@
 extend ../layout
 block content
-  script(src="/vendor/gl-matrix2.js")
-  script(src="/vendor/webgl-utils.js")
-  script(src="/vendor/jquery-2.js")
+    script(src="/vendor/gl-matrix2.js")
+    script(src="/vendor/webgl-utils.js")
+    script(src="/vendor/jquery-2.js")
 
-  script(src="/glviewer/obj-module.js")
-  include shaders
+    script(src="/glviewer/obj-module.js")
+    include shaders
 
-  script.
-    var modelURL = "/models/uploads/" + '#{model._id}';
-    $( document ).ready( function(){
-        webGLStart();
-    });
+    script.
+        var modelURL = "/models/uploads/" + '#{model._id}';
+        $( document ).ready( function(){
+            webGLStart();
+        });
 
-    function delete_pressed(){
-        var r = confirm("Are you sure you would like to delete this model and all its associated files?");
-        if(r){
-            $.ajax({
-                url: '/models/#{model._id}',
-                type: 'DELETE',
-                success: function(result) {
-                    console.log("deleted");
-                }
-            });
+        function delete_pressed(){
+            var r = confirm("Are you sure you would like to delete this model and all its associated files?");
+            if(r){
+                $.ajax({
+                    url: '/models/#{model._id}',
+                    type: 'DELETE',
+                    success: function(result) {
+                        console.log("deleted");
+                    }
+                });
+            }
         }
-    }
 
-  input(class="pure-button pure-button-error", type="button", value="Delete", onclick="delete_pressed()")
-  h2 #{model.name}
-  p
-    | #{model.description}
-  p 
-    | by 
-    a(href='/users/#{model.creator}') #{model.creator}
-  div
-    a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
-  div
-    | views: #{model.views}
-  div
-    canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-  form.pure-form
-    label.pure-radio(for="option-two")
-      input(id="public", type="radio", name="optionsRadios", value="option1")
-        | Public
-      input(id="private", type="radio", name="optionsRadios", value="option1", checked)
-        | Private
-      button.pure-button.pure-button-primary(type="submit") Apply
+    input(class="pure-button pure-button-error", type="button", value="Delete", onclick="delete_pressed()")
+    h2 #{model.name}
+    p
+        | #{model.description}
+    p 
+        | by 
+        a(href='/users/#{model.creator}') #{model.creator}
+    div
+        a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
+    div
+        | views: #{model.views}
+    div
+        canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
+        form.pure-form
+            label.pure-radio(for="option-two")
+            input(id="public", type="radio", name="optionsRadios", value="option1")
+                | Public
+            input(id="private", type="radio", name="optionsRadios", value="option1", checked)
+                | Private
+            button.pure-button.pure-button-primary(type="submit") Apply

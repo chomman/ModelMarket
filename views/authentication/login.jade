@@ -1,13 +1,13 @@
 extends ../layout
 
 block content
-  div.register-form
-    form.pure-form.pure-form-aligned(action="/login",method="post")
-      div.pure-control-group
-        label(for="username") Username
-        input(type="text",id='username', name="username")
-      div.pure-control-group
-        label Password
-        input(type="password",id='username',name="password")
-      div
-        button.pure-button.pure-button-primary(type="submit") Go
+    div.register-form
+        form.pure-form.pure-form-aligned(action="/login",method="post")
+            div.pure-control-group
+                label(for="username") Username
+                input(type="text",id='username', name="username")
+            div.pure-control-group
+                label Password
+                input(type="password",id='username',name="password")
+            div
+                button.pure-button.pure-button-primary(type="submit") Go

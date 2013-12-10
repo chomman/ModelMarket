@@ -1,19 +1,19 @@
 extend ../layout
 block content
-  p
-    | Please fill out the following fields before uploading your model
-  div.register-form
-    form.pure-form.pure-form-aligned(action='new',method='post', enctype="multipart/form-data", class="pure-form")
-      div.pure-control-group(data-role='fieldcontain')
-        label(for='name') Title: 
-        input(id='title',type='text',value='',placeholder='My Sexy Model', name="name")
-      div.pure-control-group(data-role='fieldcontain')
-        label(for='name') Price: $ 
-        input(id='title',type='text',value='',placeholder='0.00', name="price")
-      div.pure-control-group(data-role='fieldcontain')
-        label(for='description') Description: 
-        input(id='description',type='text',value='',placeholder='', name='description')
-      div.pure-control-group(data-role='fieldcontain')
-        label(for='upload') Model: 
-        input(id="upload", type="file", name="model")
-      input(type='submit', class="pure-button pure-button-primary",value='Submit',data-transition='fade', data-theme='c')
+    p
+        | Please fill out the following fields before uploading your model
+    div.register-form
+        form.pure-form.pure-form-aligned(action='new',method='post', enctype="multipart/form-data", class="pure-form")
+            div.pure-control-group(data-role='fieldcontain')
+                label(for='name') Title: 
+                input(id='title',type='text',value='',placeholder='My Sexy Model', name="name")
+            div.pure-control-group(data-role='fieldcontain')
+                label(for='name') Price: $ 
+                input(id='title',type='text',value='',placeholder='0.00', name="price")
+            div.pure-control-group(data-role='fieldcontain')
+                label(for='description') Description: 
+                input(id='description',type='text',value='',placeholder='', name='description')
+            div.pure-control-group(data-role='fieldcontain')
+                label(for='upload') Model: 
+                input(id="upload", type="file", name="model")
+                input(type='submit', class="pure-button pure-button-primary",value='Submit',data-transition='fade', data-theme='c')
