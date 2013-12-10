@@ -1,10 +1,12 @@
+/*jslint node: true */
+"use strict";
 // Users Controller
 // * * * * * * * * * * 
 var Model3d = require('./../models/model3d_schema');
 var File = require('./../models/file_schema');
 var User = require('./../models/user_schema');
 var user_model = User.model;
-var Auth = require('./authentication_controller')
+var Auth = require('./authentication_controller');
 var async = require('async');
 
 var stripe = require("stripe")(
@@ -140,6 +142,10 @@ function del_user(req, res){
     res.render('/');
 }
 
+function post_upload_image(req, res) {
+    console.log("upload_image");
+}
+
 
 module.exports = {
     get_register: get_register,
@@ -147,5 +153,6 @@ module.exports = {
     get_show: get_show,
     get_edit: get_edit,
     put_edit: put_edit,
-    del: del_user
-}
+    del: del_user,
+    post_upload_image: post_upload_image
+};

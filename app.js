@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 var url = require('url');
 var passport = require('passport')
 //#express
@@ -106,6 +108,7 @@ app.post('/users/register', users_controller.post_register);
 app.get('/users/:username', users_controller.get_show);
 app.get('/users/:username/edit', users_controller.get_edit);
 app.put('/users/:username/edit', users_controller.put_edit);
+app.post('/users/:username/upload_image', users_controller.post_upload_image);
 app.del('/users/:username', users_controller.del);
 
 console.log("running on port: " + (process.env.PORT || 3000));

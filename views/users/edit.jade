@@ -1,7 +1,36 @@
 extends ../layout
 
 block content
-  h1 Editing...
-  h2 #{user.username}
-  p 
-    | This is his page
+    script(src="/vendor/jquery-2.js")
+    h1 Editing...
+    h2 #{user.username}
+    p 
+        |This is his page
+
+    script.
+        function readURL(input) {
+            console.log("before if");
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                console.log("reached readURl");
+                reader.onload = function (e) {
+                    $('#preview_profilepic').attr('src', e.target.result).width(200).height(200);
+                    console.log("reached onload");
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $( document ).ready( function(){
+            $("#upload").change(function(){
+                readURL(this);
+            });
+        });
+
+
+    form.pure-form.pure-form-aligned(action='/users/#{user.username}/upload_image', method='post', class="pure-form")
+        input(id="upload", type="file", name="profile_picture")
+        input(type='submit', class="pure-button pure-button-primary", value='Submit',data-transition='fade', data-theme='c')
+
+    img(id="preview_profilepic", src="#")

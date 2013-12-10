@@ -1,14 +1,16 @@
 extends ../layout
 include ../mixins
 block content
-  h2 #{user.username}
-  div
+    h2 #{user.username}
+    a.pure-button.pure-button-primary(href="/users/#{user.username}/edit") Edit Profile
+        
+    div
     h2 Models by this user:
     -each m in models
-      mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
+        mixin model_link(m.name, m.description, m.views, "/models/"+m._id)  
 
     h2 Models Starred by user:
     -each m in starred
-      mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
-  p 
-    | This is his page
+        mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
+    p 
+        | This is his page
