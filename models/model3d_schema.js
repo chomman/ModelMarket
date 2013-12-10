@@ -56,7 +56,7 @@ module.exports.find_by_id = function(id, callback){
 
 module.exports.find_by_string = (function(query, callback) {
     var tokens = query.split();
-    var re = new RegExp(query);
+    var re = new RegExp(query, "i");
     db_model.find({name: re}, function(err, docs) {
         if(err) callback(err , null);
         else callback(err, docs);
