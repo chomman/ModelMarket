@@ -109,6 +109,7 @@ app.get('/users/:username', users_controller.get_show);
 app.get('/users/:username/edit', users_controller.get_edit);
 app.put('/users/:username/edit', users_controller.put_edit);
 app.post('/users/:username/upload_image', users_controller.post_upload_image);
+app.get('/users/:username/image', users_controller.get_image);
 app.del('/users/:username', users_controller.del);
 
 console.log("running on port: " + (process.env.PORT || 3000));

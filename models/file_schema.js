@@ -58,12 +58,12 @@ module.exports.find_by_id = function(id, callback){
 };
 
 module.exports.find_all_belonging_to_model_with_type = function(model_id, type, callback){
-    db_model.find({owner : model_id}, function(err, obj) {
+    Model3d.find_by_id(model_id, function(err, obj) {
         if(err) {
-            callback(err, obj);
+            callback(err, obj.grid_files);
         }
         else {
-            callback(err, obj);
+            callback(err, obj.grid_files);
         }
     });
 };
@@ -76,17 +76,26 @@ module.exports.find_all_belonging_to_model_with_type = function(model_id, type, 
 
  ---------------------------------------------------------------- */
 module.exports.move = function(new_file, locationOnDisk, new_name, callback){
-    putFileIntoDatabase(new_file, locationOnDisk, function() {
-        fs.readFile(locationOnDisk, function (err, data) {
-            console.log("yo");
-            var newPath = global.root_path + "/public/uploads/" + new_name;
-            console.log(newPath);
-            fs.writeFile(newPath, data, function (err) {
-                callback(err);
-            });
-        });
+    put_file_into_database(new_file, locationOnDisk, function(gridfs_id) {
+        new_file.gridfs_id = gridfs_id;
+        new_file.save();
+        callback(null);
     });
 };
+
+module.exports.put_file_into_database = function(locationOnDisk, callback) {
+    var gridfs = Grid(conn.db);
+   
+    var writeStream = gridfs.createWriteStream({ filename: locationOnDisk });
+    console.log("reached putFileIntoDatabase");
+    fs.createReadStream(locationOnDisk).pipe(writeStream);
+
+    writeStream.on("close", function (gridfile) {
+        console.log("file : " + gridfile);
+        console.log("write file finished");
+        callback(null, gridfile._id);
+    });
+}
 
 function delete_file(model_id) {
     var gridfs = Grid(conn.db);
@@ -106,24 +115,7 @@ function delete_file(model_id) {
     });
 }
 
-
-function putFileIntoDatabase(new_file, locationOnDisk, callback) {
-    var gridfs = Grid(conn.db);
-   
-    var writeStream = gridfs.createWriteStream({ filename: locationOnDisk });
-    console.log("reached putFileIntoDatabase");
-    fs.createReadStream(locationOnDisk).pipe(writeStream);
-
-    writeStream.on("close", function (file) {
-        console.log("file : " + file);
-        try {
-            new_file.gridfs_id = file._id;
-        }
-        
-        catch(err) {
-            console.log("file id error");
-        }
-        console.log("write file finished");
-        callback();
-    });
+module.exports.get_readstream_id = function(id){
+    var gfs = Grid(conn.db);
+    return gfs.createReadStream({_id : id});
 }

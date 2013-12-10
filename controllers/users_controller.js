@@ -142,8 +142,43 @@ function del_user(req, res){
     res.render('/');
 }
 
+// users/:username/upload_image
 function post_upload_image(req, res) {
-    console.log("upload_image");
+    console.log(req.files);
+    var user = Auth.current_user(req);
+    if(user !== req.params.username){
+        res.send("not authorized to change this users image.");
+        return;
+    }
+    User.find_by_name(user, function(err, user){
+        var temp_path = req.files.profile_picture.path;
+        File.put_file_into_database(temp_path, function(err, gridfs_id){
+            user.imageid = gridfs_id;
+            user.save(function(err){
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    console.log("Image saved!")
+                    res.redirect("/");
+                }
+            })
+        });
+    });
+}
+
+// users/:username/image
+function get_image(req, res) {
+    console.log("got here hi, " + req.params.username);
+    User.find_by_name(req.params.username, function(err, user){
+        if(err){
+            console.log(err);
+        }
+        console.log(user);
+        var readstream =  File.get_readstream_id(user.imageid);
+        console.log("readstream : " + readstream);
+        readstream.pipe(res);
+    });
 }
 
 
@@ -154,5 +189,6 @@ module.exports = {
     get_edit: get_edit,
     put_edit: put_edit,
     del: del_user,
-    post_upload_image: post_upload_image
+    post_upload_image: post_upload_image,
+    get_image: get_image
 };

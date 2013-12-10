@@ -24,6 +24,11 @@ var modelSchema = new mongoose.Schema({
     required: true
   },
   favorites: Array,
+  grid_files: Array,
+  grid_display:{
+    type:  mongoose.Schema.Types.ObjectId,
+    index: false
+  },
   public: {
       type: Boolean,
       default: false

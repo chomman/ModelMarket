@@ -25,7 +25,7 @@ html
             
             if (passport.user)
               div.login-container
-                img.profile-picture(src='http://placehold.it/125x125')
+                img.profile-picture(src='/users/#{passport.user}/image')
                 li.user-link
                   a(href="/users/#{passport.user}") #{passport.user}
                 li

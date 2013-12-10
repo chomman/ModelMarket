@@ -29,7 +29,7 @@ block content
         });
 
 
-    form.pure-form.pure-form-aligned(action='/users/#{user.username}/upload_image', method='post', class="pure-form")
+    form.pure-form.pure-form-aligned(action='/users/#{user.username}/upload_image', method='post', class="pure-form",  enctype="multipart/form-data")
         input(id="upload", type="file", name="profile_picture")
         input(type='submit', class="pure-button pure-button-primary", value='Submit',data-transition='fade', data-theme='c')
 

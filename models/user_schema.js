@@ -32,6 +32,7 @@ var userSchema = new mongoose.Schema({
         },
         uploads: Array,
         purchases: Array,
+        imageid: mongoose.Schema.Types.ObjectId
 });
 
 userSchema.plugin(passportLocalMongoose);

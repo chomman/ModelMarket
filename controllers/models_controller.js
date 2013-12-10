@@ -53,46 +53,24 @@ function post_new(req, res){
     new_file.location = obj_file_name;
     new_file.type = obj_file_type;
 
-    //Do all 3 of these tasks in parallel asyncronously and then meetup at the end
-    async.parallel([
-        function(callback){
-            File.move(new_file, req.files.model.path, obj_file_name, function(err){
-                if(err)
-                {
-                    console.log("There was an error moving the file to uploads");
-                    console.log(err);
-                    callback(err);
-                }
-                else
-                {
-                    new_file.save(function (err, product, numberAffected) {
-                        if(err){
-                            console.log("There was an error saving the file to the db! \n" + err);
-                        }
-                        else {
-                            console.log("File saved!");
-                            callback(null, null); 
-                        }
-                    });
-                } 
-            });
-        },
-        function(callback){
-            new_model3d.save(function (err, product, numberAffected) {
-                if(err){
-                    console.log("There was an error saving the model3d to the db! \n" + err);
-                    callback(err);
-                }
-                else {
-                    callback(null, product);
-                }
-            });
+
+    File.put_file_into_database(req.files.model.path, function(err, gridfs_id){
+        if(err)
+        {
+            console.log("There was an error moving the file to the database");
+            console.log(err);
+            res.redirect("/");
         }
-    ], function (err, results){
-        console.log(results);
-        console.log("new model id: " + new_model3d.id);
-        res.redirect("models/"+new_model3d.id);
+        else
+        {
+            new_model3d.grid_files.push(gridfs_id);
+            new_model3d.grid_display = gridfs_id;
+            new_model3d.save(function(err){
+                res.redirect("/");
+            });
+        } 
     });
+
 }
 
 // models/:id GET
@@ -104,21 +82,28 @@ function get_show(req, res){
             console.log(model_obj);
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
-            File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(err, file_obj_array)
+            /*File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(err, file_obj_array)
             {
-                var should_show_edit = (Auth.current_user(req) === model_obj.creator);
                 console.log("show_edit: " + should_show_edit + "for user: " + Auth.current_user(req));
-                var starred = model_obj.favorites.indexOf(Auth.current_user(req)) != -1;
-                var logged_in = Auth.current_user(req) != null;
                 res.render('models/show', {model: model_obj
-                                          ,model_URL: file_obj_array[0].location
+                                          ,model_URL: model_obj.grid_display
                                           , description: model_obj.description
                                           , show_edit: should_show_edit
                                           , starred: starred
                                           , logged_in: logged_in
                                           , keys: global.keys});
-            });
+            });*/
+            var should_show_edit = (Auth.current_user(req) === model_obj.creator);
+            var starred = model_obj.favorites.indexOf(Auth.current_user(req)) != -1;
+            var logged_in = Auth.current_user(req) != null;
 
+            res.render('models/show', {model: model_obj
+                                          ,model_URL: model_obj.grid_display
+                                          , description: model_obj.description
+                                          , show_edit: should_show_edit
+                                          , starred: starred
+                                          , logged_in: logged_in
+                                          , keys: global.keys});
             //save the model becasue we updated how many views it had
             model_obj.save(function(err){
                 console.log(err);
@@ -317,20 +302,15 @@ function post_buy(req, res){
     
 }
 
+// models/uploads/:id
 function get_file(req, res) {
     var gridfs = Grid(conn.db);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        File.model.find({owner : model_obj._id}, function(err, files){ 
-            for (var index in files) {
-                var file = files[index];
-                console.log(file);
 
-                var readstream = gridfs.createReadStream({_id : file.gridfs_id});
-                console.log("readstream : " + readstream);
-                res.header('Content-Type', 'plain/text');
-                readstream.pipe(res);
-            }
-        });
+        var readstream = gridfs.createReadStream({_id : model_obj.grid_display});
+        console.log("readstream : " + readstream);
+        res.header('Content-Type', 'plain/text');
+        readstream.pipe(res);
     });
 }
 
