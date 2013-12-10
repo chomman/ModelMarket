@@ -99,11 +99,15 @@ function post_upload_image(req, res) {
 }
 
 function get_bank_info(req, res){
-    res.render('users/bank_info', { });
+    if(Auth.current_user(req) == req.params.username){
+        res.render('users/bank_info', { });
+    }
+    else{
+        res.send("Not Authorized to perform this action. Sorry");
+    }
 }
 
 function post_bank_info(req, res){
-
     var first_name = req.body.firstname;
     var last_name = req.body.lastname;
     var routing_number = req.body.routingNumber;
@@ -165,6 +169,7 @@ function post_bank_info(req, res){
             }   
         }
     });
+
 }
 
 module.exports = {
