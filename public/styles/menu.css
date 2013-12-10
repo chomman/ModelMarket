@@ -290,10 +290,12 @@ a:hover{
     height: 100px;
     margin: auto;
     border-radius: 150px;
-    background-size: auto;
-    -webkit-border-radius: 70px;
-    -moz-border-radius: 70px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, .8);
-    -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
-    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
-}
+    -webkit-border-radius: 150px;
+    -moz-border-radius: 150px;
+
+    }
+
+.circular img {
+    opacity: 0;
+    filter: alpha(opacity=0);
+    }
