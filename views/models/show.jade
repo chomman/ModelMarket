@@ -8,7 +8,7 @@ block content
   script(src="https://checkout.stripe.com/v2/checkout.js")
 
   include shaders
-  
+
   script.
     var modelURL = "/models/uploads/" + '#{model._id}';
     var starred = #{starred};
@@ -51,7 +51,7 @@ block content
           span
             |  #{model.favorites.length || 0}
       li
-        a(href="/models/#start/edit")
+        a(href="#", onclick="goFullScreen()")
           i(class="fa fa-fullscreen fa-lg")
           |  Full Screen
         

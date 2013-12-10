@@ -541,3 +541,14 @@ function face(_v1, _v2, _v3){
         this.normal = normal;
     }
 }
+
+function goFullScreen(){
+    var canvas = document.getElementById("my-canvas");
+    console.log(canvas);
+    if(canvas.requestFullScreen)
+        canvas.requestFullScreen();
+    else if(canvas.webkitRequestFullScreen)
+        canvas.webkitRequestFullScreen();
+    else if(canvas.mozRequestFullScreen)
+        canvas.mozRequestFullScreen();
+}
