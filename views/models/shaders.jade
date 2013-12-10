@@ -19,7 +19,7 @@ script(id="shader-fs", type="x-shader/x-fragment").
       vec3 lightDirectionWithRespectToVertex = normalize(vPosition - lightPosition);
       vec3 reflectionDirection = reflect(-lightDirectionWithRespectToVertex, vNormal);
 
-      float phongShading = max(dot(normalize(vNormal), lightDirectionWithRespectToVertex), 0.0);
+      float phongShading = max(dot(normalize(vNormal), lightDirectionWithRespectToVertex), 0.4);
 
       float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), 25.0);
 
