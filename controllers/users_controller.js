@@ -22,71 +22,23 @@ function  get_register(req, res) {
 // users/register POST
 function post_register(req, res) {
     console.log("--------new user----------");
-    console.log(req.body.firstname);
-    console.log(req.body.lastname);
     console.log(req.body.username);
     console.log(req.body.password);
-    console.log(req.body.email);
-    console.log(req.body.routingNumber);
-    console.log(req.body.accountNumber);
     console.log("--------------------------");
 
-    var first_name = req.body.firstname;
-    var last_name = req.body.lastname;
-    var routing_number = req.body.routingNumber;
-    var account_number = req.body.accountNumber;
     //stripe.setApiKey(global.keys.stripeSecretTest);
-    var token = stripe.tokens.create({
-    bank_account: {
-                    country: 'US',
-                    routing_number: routing_number,
-                    account_number: account_number
-                  }
-    }, function(err, token) {
-        if(err)
-        {
-            console.log("ERROR");
-            console.log(err);
-        }
-        else
-        {
-            if(token["id"] != undefined)
-            {
-                console.log(token["id"]);
-                stripe.recipients.create({
-                                        name: first_name + " " + last_name,
-                                        type: "individual",
-                                        bank_account: token["id"],
-                                        email: req.body.email
-                }, function(err, recipient) 
-                {
-                    if(err)
-                    {
-                        console.log(err);
-                    }
-                    else
-                    {
-                        console.log(recipient);
-                        user_model.register(new user_model({firstname : first_name, 
-                                                    lastname : last_name, 
-                                                    username : req.body.username, 
-                                                    recipientid : recipient["id"],
-                                                    email: req.body.email}), 
-                                                    req.body.password, 
-                                                    function(err, account) {
+    
+    user_model.register(new user_model({
+                                        username : req.body.username,
+                                        email: req.body.email}), 
+                                        req.body.password, 
+                                        function(err, account) {
                         if (err) 
                         {
-                            return res.render('users/register', { account : account });
+                            return res.render('users/register', { });
                         }
                         res.redirect('/');
                         });
-                    }
-
-                });
-                
-            }   
-        }
-    });
     
 }
 
@@ -146,6 +98,74 @@ function post_upload_image(req, res) {
     console.log("upload_image");
 }
 
+function get_bank_info(req, res){
+    res.render('users/bank_info', { });
+}
+
+function post_bank_info(req, res){
+
+    var first_name = req.body.firstname;
+    var last_name = req.body.lastname;
+    var routing_number = req.body.routingNumber;
+    var account_number = req.body.accountNumber;
+    var token = stripe.tokens.create({
+    bank_account: {
+                    country: 'US',
+                    routing_number: routing_number,
+                    account_number: account_number
+                  }
+    }, function(err, token) {
+        if(err)
+        {
+            console.log("ERROR");
+            console.log(err);
+        }
+        else
+        {
+            if(token["id"] != undefined)
+            {
+                console.log(token["id"]);
+                stripe.recipients.create({
+                                        name: first_name + " " + last_name,
+                                        type: "individual",
+                                        bank_account: token["id"],
+                                        email: req.body.email
+                }, function(err, recipient) 
+                {
+                    if(err)
+                    {
+                        console.log(err);
+                    }
+                    else
+                    {
+                        console.log(recipient);
+                        console.log("Hello There I reached here");
+                        User.find_by_name(req.params.username, function(err, user_obj){
+                            console.log(user_obj);
+                            user_obj.firstname = first_name;
+                            user_obj.lastname = last_name;
+                            user_obj.recipientid = recipient["id"];
+                            user_obj.save(function(err){
+                                if(err)
+                                {
+                                    console.log(err);
+                                    res.status(500);
+                                    res.send("Server error");
+                                }
+                                else
+                                {
+                                    res.redirect('/');
+                                }
+                            });
+                        });
+                    }
+
+                });
+                
+            }   
+        }
+    });
+}
 
 module.exports = {
     get_register: get_register,
@@ -154,5 +174,7 @@ module.exports = {
     get_edit: get_edit,
     put_edit: put_edit,
     del: del_user,
-    post_upload_image: post_upload_image
+    post_upload_image: post_upload_image,
+    get_bank_info: get_bank_info,
+    post_bank_info: post_bank_info
 };

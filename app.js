@@ -110,6 +110,8 @@ app.get('/users/:username/edit', users_controller.get_edit);
 app.put('/users/:username/edit', users_controller.put_edit);
 app.post('/users/:username/upload_image', users_controller.post_upload_image);
 app.del('/users/:username', users_controller.del);
+app.get('/users/:username/bank_info', users_controller.get_bank_info);
+app.post('/users/:username/bank_info', users_controller.post_bank_info);
 
 console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);
