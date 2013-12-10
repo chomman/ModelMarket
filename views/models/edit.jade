@@ -8,7 +8,7 @@ block content
   include shaders
 
   script.
-    var modelURL = "/uploads/" + '#{model_URL}';
+    var modelURL = "/models/uploads/" + '#{model._id}';
     $( document ).ready( function(){
         webGLStart();
     });

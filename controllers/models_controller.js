@@ -82,17 +82,6 @@ function get_show(req, res){
             console.log(model_obj);
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
-            /*File.find_all_belonging_to_model_with_type(parent_id, "OBJ", function(err, file_obj_array)
-            {
-                console.log("show_edit: " + should_show_edit + "for user: " + Auth.current_user(req));
-                res.render('models/show', {model: model_obj
-                                          ,model_URL: model_obj.grid_display
-                                          , description: model_obj.description
-                                          , show_edit: should_show_edit
-                                          , starred: starred
-                                          , logged_in: logged_in
-                                          , keys: global.keys});
-            });*/
             var should_show_edit = (Auth.current_user(req) === model_obj.creator);
             var starred = model_obj.favorites.indexOf(Auth.current_user(req)) != -1;
             var logged_in = Auth.current_user(req) != null;
@@ -109,6 +98,24 @@ function get_show(req, res){
                 console.log(err);
             });
         } 
+    });
+}
+
+
+// models/:id/edit GET
+function get_model_edit(req, res){
+    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        if(err){
+            console.log(err);
+            res.status(500).send('something_broke :(');
+            return;
+        }
+        if(Auth.current_user(req) == model_obj.creator){
+            res.render("models/edit", {model: model_obj, model_URL:  model_obj.grid_display});
+            return;
+        }else{
+            res.status(401).send('You are unauthorized to modify this model');
+        }
     });
 }
 
@@ -184,25 +191,6 @@ function toggle_star(req, res, increase){
     });
 }
 
-// models/:id/edit GET
-function get_model_edit(req, res){
-    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        if(err){
-            console.log(err);
-            res.status(500).send('something_broke :(');
-            return;
-        }
-        if(Auth.current_user(req) == model_obj.creator){
-            File.find_all_belonging_to_model_with_type(model_obj._id, "OBJ", function(err, file_obj_array)
-            {
-                res.render("models/edit", {model: model_obj, model_URL: file_obj_array[0].location});
-                return;
-            });
-        }else{
-            res.status(401).send('You are unauthorized to modify this model');
-        }
-    });
-}
 
 function get_buy(req, res){
     Model3d.find_by_id(req.params.id, function(err, obj){
@@ -296,7 +284,6 @@ function post_buy(req, res){
             console.log("No charge");
             //res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id, message: res_message});
         }
-        //console.log(charge);
     }
     });
     
@@ -306,7 +293,11 @@ function post_buy(req, res){
 function get_file(req, res) {
     var gridfs = Grid(conn.db);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-
+        if(err || !model_obj){
+            res.status(404).send();
+            console.log(err);
+            return;
+        }
         var readstream = gridfs.createReadStream({_id : model_obj.grid_display});
         console.log("readstream : " + readstream);
         res.header('Content-Type', 'plain/text');
