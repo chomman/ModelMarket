@@ -2,8 +2,10 @@ extends ../layout
 include ../mixins
 block content
     h2 #{user.username}
-    a.pure-button.pure-button-primary(href="/users/#{user.username}/edit") Edit Profile
-        
+    div
+        a.pure-button.pure-button-primary(href="/users/#{user.username}/edit") Edit Profile
+
+
     div
     h2 Models by this user:
     -each m in models
@@ -14,3 +16,6 @@ block content
         mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
     p 
         | This is his page
+
+    div
+        a.pure-button.pure-button-primary(href="/users/#{user.username}/bank_info") Add Bank Info

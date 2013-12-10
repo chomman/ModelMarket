@@ -1,0 +1,19 @@
+extends ../layout
+
+block content
+  div.register-form
+    form.pure-form.pure-form-aligned(action="",method="post")
+      div.pure-control-group
+        label(for="firstname") First Name
+        input(type="text", id='firstname', name="firstname", placeholder="John")
+      div.pure-control-group
+        label(for="lastname") Last Name
+        input(type="text", id='lastname', name="lastname", placeholder="Doe")
+      div.pure-control-group
+        label(for="accountNumber") Account Number
+        input(id="accountNumber",type="text",name="accountNumber", placeholder="000123456789")
+      div.pure-control-group
+        label(for="routingNumber") Routing Number
+        input(id="routingNumber",type="text",name="routingNumber", placeholder="110000000")
+      div
+        button.pure-button.pure-button-primary(type="submit") Submit Bank Info
