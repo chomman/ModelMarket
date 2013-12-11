@@ -2,6 +2,10 @@ extend ../layout
 include ../mixins
 
 block content
+    div.register-form
+        form.pure-form(action="/search",method="post")
+            input(type="text", class="pure-u-3-4", id='search_bar', name="search_bar", placeholder="teapot")
+            button.pure-button.pure-button-primary(type="submit") Search
     div
         h2 Models in the database right now: 
         -each m in models

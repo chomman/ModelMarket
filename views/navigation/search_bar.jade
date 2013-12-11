@@ -1,8 +1,9 @@
 extend ../layout
-include ../mixins
 
 block content
-     
-    form(class="pure-form", action="/search",method="post")
-        input(type="text", name="search_bar", placeholder="Search")
-        input(class="pure-button pure-button-primary", type="submit", value="Submit")
+    div.register-form
+        form.pure-form.pure-form-aligned(action="/search",method="post")
+            div.pure-control-group
+                input(type="text", id='search_bar', name="search_bar", placeholder="teapot")
+            div
+                button.pure-button.pure-button-primary(type="submit") Search
