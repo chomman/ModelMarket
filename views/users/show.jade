@@ -5,11 +5,9 @@ block content
     div.circular(style="background: url(/users/#{user.username}/image) no-repeat; background-size: cover; margin-left:0")
     p 
         | Welcome to your profile page
-    form.pure-form
-        fieldset.pure-group
-            a.pure-button.pure-button-primary(href="/users/#{user.username}/edit") Edit Profile
-        fieldset.pure-group
-            a.pure-button.pure-button-primary(href="/users/#{user.username}/bank_info") Add Bank Info
+
+    a.pure-button.pure-button-primary(href="/users/#{user.username}/edit", style="margin-right:10px") Edit Profile
+    a.pure-button.pure-button-primary(href="/users/#{user.username}/bank_info") Add Bank Info
     div
     h2 Models by this user:
     -each m in models

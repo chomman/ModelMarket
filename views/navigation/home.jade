@@ -3,8 +3,8 @@ include ../mixins
 
 block content
     div.register-form
-        form.pure-form(action="/search",method="post")
-            input(type="text", class="pure-u-3-4", id='search_bar', name="search_bar", placeholder="teapot")
+        form.pure-form(action="/search",method="post", style="margin-bottom:30px")
+            input(type="text", class="pure-u-3-4", id='search_bar', name="search_bar", placeholder="teapot", style="margin-right:10px")
             button.pure-button.pure-button-primary(type="submit") Search
     div
         -each m in models
