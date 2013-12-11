@@ -1,11 +1,10 @@
 mixin model_link(name, description, views, url)
-    .pure-g-r.model-list
-        .pure-u-1-4
+    .pure-g-r.model-list(style="margin-bottom:10px")
+        .pure-u-1-4(style="max-height:150px")
             img.model-image(src="http://placehold.it/150x150")
-        .pure-u-3-4
+        .pure-u-3-4(style="max-height:150px")
             a(href='#{url}')
                 h4 #{name}
-            p 
-                | #{description}
+            | #{description}
             p
                 | #{views}
