@@ -153,12 +153,10 @@ function drawScene() {
 
     if(modelLoaded){
         mvPushMatrix();
-        mat4.translate(mvMatrix, mvMatrix, [0, 0, 0.0]);
         mat4.rotate(mvMatrix, mvMatrix, xoff, [0.0, 1.0, 0.0]);
-
         mat4.rotate(mvMatrix, mvMatrix, yoff, [1.0, 0.0, 0.0]);
-        
-        //mat4.translate(mvMatrix, mvMatrix, [0, 0, 1.0]);
+        mat4.translate(mvMatrix, mvMatrix, [-center[0], -center[1], -center[2]]);
+
         
         //Bind Vertex Locations
         gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexPositionBuffer);
@@ -307,6 +305,35 @@ var modelVertexTextureBuffer;
 var modelVertexIndexBuffer;
 var modelVertexNormalBuffer;
 var normalAccumilator;
+var avex = 0;
+var avey = 0;
+var avez = 0;
+var max_min_x = [0,0];
+var max_min_y = [0,0];
+var max_min_z = [0,0];
+
+var center;
+
+function maxmin(x, y, z){
+    if(x < max_min_x[0]){
+        max_min_x[0] = x;
+    }
+    if(x > max_min_x[1]){
+        max_min_x[1] = x;
+    }
+    if(y < max_min_y[0]){
+        max_min_y[0] = y;
+    }
+    if(y > max_min_y[1]){
+        max_min_y[1] = y;
+    }
+    if(z < max_min_z[0]){
+        max_min_z[0] = z;
+    }
+    if(z > max_min_z[1]){
+        max_min_z[1] = z;
+    }
+}
 function finishedModelDownload(data){
     //debugger;
 
@@ -314,16 +341,9 @@ function finishedModelDownload(data){
     var lines = text.split(/\n/);
     normalAccumilator = new Array();
     scene.vertices = new Array();
-
-    var vertex_pattern = /v( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
-    var normal_pattern = /vn( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
-    var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
-    var face_pattern1 = /f( +\d+)( +\d+)( +\d+)( +\d+)?/;
-    var face_pattern2 = /f( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))?/;
-    var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
-    var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
-
     console.log("start parsing");
+
+
     for(var i =0; i < lines.length; i++){
 
         var line = lines[i].trim();
@@ -334,9 +354,16 @@ function finishedModelDownload(data){
             if(elems.length > 4){
                 console.log("bad vertex? " + line);
             }else{
-                scene.vertices.push(parseFloat( elems[ 1 ] ));
-                scene.vertices.push(parseFloat( elems[ 2 ] ));
-                scene.vertices.push(parseFloat( elems[ 3 ] ));
+                var v1 = parseFloat( elems[ 1 ] );
+                var v2 = parseFloat( elems[ 2 ] );
+                var v3 = parseFloat( elems[ 3 ] );
+                avex += v1;
+                avey += v2;
+                avez += v3;
+                maxmin(v1,v2,v3);
+                scene.vertices.push(v1);
+                scene.vertices.push(v2);
+                scene.vertices.push(v3);
                 normalAccumilator.push(vec3.create());
             }
         }
@@ -347,11 +374,20 @@ function finishedModelDownload(data){
             }
             var numFaces = elems.length - 2;
             for(var j = 1; j < numFaces; j++){
-                tempFace = vec3.fromValues(parseInt( elems[1] )-1,parseInt( elems[j+1] )-1,parseInt( elems[j+2] )-1);
+                var a = parseInt( elems[1].split("/")[0] )-1;
+                var b = parseInt( elems[j+1].split("/")[0] )-1;
+                var c = parseInt( elems[j+2].split("/")[0] )-1;
+                tempFace = vec3.fromValues(a,b,c);
                 scene.faces.push(tempFace);
             }
         }
     }
+    avex = avex / scene.vertices.length;
+    avey = avey / scene.vertices.length;
+    avez = avez / scene.vertices.length;
+
+    center = [(max_min_x[1] + max_min_x[0])/2,(max_min_y[1] + max_min_y[0])/2,(max_min_z[1] + max_min_z[0])/2];
+
     console.log("finished parsing");
     console.log(scene.vertices.length);
     console.log(scene.faces.length);
