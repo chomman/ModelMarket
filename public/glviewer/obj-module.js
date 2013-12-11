@@ -144,7 +144,7 @@ function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 1000.0);
 
 
     mat4.identity(mvMatrix);
@@ -323,72 +323,36 @@ function finishedModelDownload(data){
     var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
     var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/
 
+    console.log("start parsing");
     for(var i =0; i < lines.length; i++){
-        var line = lines[i];
 
-        if(line.length === 0 || line[0] === '#'){
-            continue;
+        var line = lines[i].trim();
+
+        if(line[0] == "v" && line[1] == " "){
+            //found vertex
+            var elems = line.split(/\s+/g);
+            if(elems.length > 4){
+                console.log("bad vertex? " + line);
+            }else{
+                scene.vertices.push(parseFloat( elems[ 1 ] ));
+                scene.vertices.push(parseFloat( elems[ 2 ] ));
+                scene.vertices.push(parseFloat( elems[ 3 ] ));
+                normalAccumilator.push(vec3.create());
+            }
         }
-        else if ( ( result = vertex_pattern.exec( line ) ) !== null ) {
-            // ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-            scene.vertices.push(parseFloat( result[ 1 ] ));
-            scene.vertices.push(parseFloat( result[ 2 ] ));
-            scene.vertices.push(parseFloat( result[ 3 ] ));
-            normalAccumilator.push(vec3.create());
-
-
-        } else if ( ( result = normal_pattern.exec( line ) ) !== null ) {
-            // ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-        } else if ( ( result = uv_pattern.exec( line ) ) !== null ) {
-            // ["vt 0.1 0.2", "0.1", "0.2"]
-        } else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
-            // just a mesh, no textures or normals
-            // ["f 1 2 3", "1", "2", "3", undefined]
-            if ( result[ 4 ] === undefined ) {
-                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[2] )-1,parseInt( result[3] )-1);
-                scene.faces.push(tempFace);        
-            } else {
-                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[2] )-1,parseInt( result[3] )-1);
-                scene.faces.push(tempFace);
-                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[3] )-1,parseInt( result[4] )-1);
+        else if(line[0] == "f" && line[1] == " "){
+            var elems = line.split(/\s+/g);
+            if(elems.length < 4){
+                console.log("face was messed up: " + line);
+            }
+            var numFaces = elems.length - 2;
+            for(var j = 1; j < numFaces; j++){
+                tempFace = vec3.fromValues(parseInt( elems[1] )-1,parseInt( elems[j+1] )-1,parseInt( elems[j+2] )-1);
                 scene.faces.push(tempFace);
             }
-
-        } else if ( ( result = face_pattern2.exec( line ) ) !== null ) {
-            // ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-            if ( result[ 10 ] === undefined ) {
-                tempFace = vec3.fromValues(parseInt( result[2] )-1,parseInt( result[5] )-1,parseInt( result[8] )-1);
-                scene.faces.push(tempFace);        
-            } else {
-                tempFace = vec3.fromValues(parseInt( result[2] )-1,parseInt( result[5] )-1,parseInt( result[8] )-1);
-                scene.faces.push(tempFace);
-                tempFace = vec3.fromValues(parseInt( result[1] )-1,parseInt( result[8] )-1,parseInt( result[11] )-1);
-                scene.faces.push(tempFace);
-            }
-
-        } else if ( ( result = face_pattern3.exec( line ) ) !== null ) {
-
-            // ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
-
-        } else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
-            
-            // ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
-        } else if ( /^o /.test( line ) ) {            
-            // object
-        } else if ( /^g /.test( line ) ) {
-            // group
-        } else if ( /^usemtl /.test( line ) ) {
-            // material
-            //material.name = line.substring( 7 ).trim();
-        } else if ( /^mtllib /.test( line ) ) {
-            // mtl file
-        } else if ( /^s /.test( line ) ) {
-            // smooth shading
-        } else {
-            console.log(line);
-           // console.log( "THREE.OBJLoader: Unhandled line " + line );
         }
     }
+    console.log("finished parsing");
     console.log(scene.vertices.length);
     console.log(scene.faces.length);
     for(var i = 0; i < scene.faces.length; i++){
