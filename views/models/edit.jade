@@ -21,6 +21,7 @@ block content
                     type: 'DELETE',
                     success: function(result) {
                         console.log("deleted");
+                        window.location = "/";
                     }
                 });
             }
@@ -30,16 +31,9 @@ block content
     h2 #{model.name}
     p
         | #{model.description}
-    p 
-        | by 
-        a(href='/users/#{model.creator}') #{model.creator}
     div
-        a(class="pure-button pure-button-primary", href="#") Buy Now $#{model.price}
-    div
-        | views: #{model.views}
-    div
-        canvas.gl-player(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
-        form.pure-form
+        canvas.gl-player.model-canvas(id="my-canvas", width="800px", height="400px", onload="webGLStart();")
+        //form.pure-form
             label.pure-radio(for="option-two")
             input(id="public", type="radio", name="optionsRadios", value="option1")
                 | Public

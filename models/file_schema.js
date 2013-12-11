@@ -30,23 +30,26 @@ module.exports.put_file_into_database = function(locationOnDisk, callback) {
     });
 }
 
-function delete_file(model_id) {
+
+/* ----------------------------------------------------
+// delete_file
+// @gridfs_id : the id of the file in the gridfs database
+// @callback (err) : a callback that takes an error
+*/
+ module.exports.delete_file = function(gridfs_id, callback) {
     var gridfs = Grid(conn.db);
-    db_model.find({owner : model_id}, function(err, files) {
-        for (var index in files) {
-            console.log("reached here");
-            var file = files[index];
-            console.log(file);
-            gridfs.remove({_id : file.gridfs_id}, function() {
-                if (err) {
-                    console.log(err);
-                }
-                console.log('success');
-                file.remove();
-            });
+    gridfs.remove({_id : gridfs_id}, function() {
+        if (err) {
+            console.log(err);
+            callback(err);
+        }
+        else{
+            callback(err);
         }
     });
 }
+
+
 
 module.exports.get_readstream_id = function(id){
     var gfs = Grid(conn.db);

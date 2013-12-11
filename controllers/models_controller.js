@@ -113,23 +113,28 @@ function get_model_edit(req, res){
 // models/:id DELETE
 function delete_model(req, res){
     Model3d.find_by_id(req.params.id, function(err, model_obj){
-        //taruns code here. Delete(model_obj.upload) make a callback to call the code below.
         console.log(model_obj);
-        File.delete_file(model_obj._id);
+        for(var i =0; i < model_obj.grid_files.length; i ++){
+            var gridfs_id = model_obj.grid_files[i];
+            File.delete_file(gridfs_id);
+        }
         
-        model_obj.remove();
-        User.find_by_name(model_obj.creator, function(err, user){
-            if(err){
-                console.log(err);
+        User.find_by_name(model_obj.creator, function(error, user){
+            if(error){
+                console.log("was an error reading the model: " + error);
             }
             else{
+                console.log("found the user!");
                 var index = user.uploads.indexOf(model_obj._id);
                 if(index != -1){
                    user.uploads.splice(index, 1); 
                 }
                 user.save();
+                model_obj.remove();
+                res.send("done");
             }
         });
+
     });
 }
 
@@ -198,84 +203,75 @@ function post_buy(req, res){
     var amount = req.body.amount;
     var currency = req.body.currency;
     var description = req.body.description;
-    console.log(amount);
-    console.log(stripeToken);
-    console.log("crap");
     var charge = stripe.charges.create({
         amount: amount, // amount in cents, again
         currency: "usd",
         card: stripeToken,
         description: "description"
     }, function(err, charge) {
-    if (err && err.type === 'StripeCardError') {
-        console.log("ERROR");
-        console.log(err);
-    }
-    else
-    {
-        if(charge["captured"])
-        {
-            res_message = "Your payment has been successful."
-            console.log("Made charge");
-            console.log(req.params.id);
-            Model3d.find_by_id(req.params.id, function(err, obj){
-                if(err){
-                    console.log(err); 
-                    res.send('something_broke :(');
-                }
-                else{
-                    console.log(obj);
-                    var creator = obj.creator;
-                    User.find_by_name(creator, function(err, user_obj){
-                        if(err){
-                            console.log(err);
-                        }
-                        else{
-                            //console.log(user_obj);
-                            //console.log(user_obj.bankToken);
-                            var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
-                                if(err)
-                                {
-                                    console.log(err);
-                                }
-                                else
-                                {
-                                    console.log(recipient);
-                                    stripe.transfers.create({
-                                                amount: amount,
-                                                currency: "usd",
-                                                recipient: recipient["id"],
-                                                description: "Transfer for test@example.com"
-                                            }, function(err, transfer) {
-                                                if(err)
-                                                {
-                                                    console.log(err);
-                                                }
-                                                else
-                                                {
-                                                    console.log(transfer);
-                                                }
-                                    });
-                                }
-
-                            });
-                        }
-                    });
-                    res.render('models/buy', {name: obj.name,
-                                               description: obj.description,
-                                               price: obj.price,
-                                               id: obj._id,
-                                               message: res_message});
-                    }
-            });
+        if (err && err.type === 'StripeCardError') {
+            console.log("ERROR");
+            console.log(err);
         }
         else
         {
-            res_message = "Your payment has been unsuccessful."
-            console.log("No charge");
-            //res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id, message: res_message});
+            if(charge["captured"])
+            {
+                res_message = "Your payment has been successful."
+                console.log("Made charge");
+                console.log(req.params.id);
+                Model3d.find_by_id(req.params.id, function(err, obj){
+                    if(err){
+                        console.log(err); 
+                        res.send('something_broke :(');
+                    }
+                    else{
+                        //console.log(obj);
+                        var creator = obj.creator;
+                        User.find_by_name(creator, function(err, user_obj){
+                            if(err){
+                                console.log(err);
+                            }
+                            else{
+                                if(!user_obj.recipientid){
+                                    console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
+
+                                }else{
+                                    var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
+                                        if(err){
+                                            console.log(err);
+                                        }else{
+                                            //console.log(recipient);
+                                            stripe.transfers.create({
+                                                        amount: amount,
+                                                        currency: "usd",
+                                                        recipient: recipient["id"],
+                                                        description: "Transfer for test@example.com"}
+                                                    ,function(err, transfer) {
+                                                        if(err){
+                                                            console.log(err);
+                                                        }else{
+                                                            console.log(transfer);
+                                                        }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        res.render('models/buy', {name: obj.name,
+                                                   description: obj.description,
+                                                   price: obj.price,
+                                                   id: obj._id,
+                                                   message: res_message});
+                        }
+                });
+            }
+            else{
+                res_message = "Your payment has been unsuccessful."
+                console.log("No charge");
+            }
         }
-    }
     });
     
 }
