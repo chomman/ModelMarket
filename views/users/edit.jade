@@ -2,11 +2,8 @@ extends ../layout
 
 block content
     script(src="/vendor/jquery-2.js")
-    h1 Editing...
     h2 #{user.username}
-    p 
-        |This is his page
-
+    div.circular(style="background: url(/users/#{user.username}/image) no-repeat; background-size: cover; margin-left:0")
     script.
         function readURL(input) {
             console.log("before if");
@@ -32,4 +29,4 @@ block content
         input(id="upload", type="file", name="profile_picture")
         input(type='submit', class="pure-button pure-button-primary", value='Submit',data-transition='fade', data-theme='c')
 
-    img(id="preview_profilepic", src="#")
+    img(id="preview_profilepic")
