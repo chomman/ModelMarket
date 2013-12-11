@@ -16,7 +16,7 @@ script(id="shader-fs", type="x-shader/x-fragment").
 
       vec3 eyeDirection = normalize(-vPosition);
       
-      vec3 lightDirectionWithRespectToVertex =normalize(vec3(0.2, 1.0, 0.2));//normalize(vPosition - lightPosition);
+      vec3 lightDirectionWithRespectToVertex =normalize(vec3(0.2, 0.5, 1.0));//normalize(vPosition - lightPosition);
       vec3 reflectionDirection = reflect(-lightDirectionWithRespectToVertex, vNormal);
 
       float phongShading = max(dot(normalize(vNormal), lightDirectionWithRespectToVertex), 0.2);
