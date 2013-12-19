@@ -1,8 +1,8 @@
-"use strict"
+/*jslint node: true */
+"use strict";
 // Navigation Controller
 // * * * * * * * * * * 
 var Model3d = require('./../models/model3d_schema');
-var File = require('./../models/file_schema');
 
 // / GET
 function home(req, res){
@@ -21,10 +21,16 @@ function search(req, res){
     res.render('navigation/search_bar', {selected: "search" });
 }
 
+/**
+ * Renders the about page.
+ **/
 function about(req, res){
     res.render('about', {selected: "about"});
 }
 
+/**
+ * Renders the search results.
+ **/
 function post_search(req, res) {
     console.log(req.body);
     Model3d.find_by_string(req.body.search_bar, function(err, docs) {
