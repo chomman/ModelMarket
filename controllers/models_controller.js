@@ -23,7 +23,7 @@ var async = require('async');
 
 // models/new GET
 function get_new(req, res){
-    if(Auth.current_user(req) != null) {
+    if(Auth.current_user(req) !== null) {
         res.render('models/new', {selected: "upload"});
     }else {
         res.redirect('/login');
@@ -74,8 +74,8 @@ function get_show(req, res){
             model_obj.views = model_obj.views + 1; 
             var parent_id = model_obj._id;
             var should_show_edit = (Auth.current_user(req) === model_obj.creator);
-            var starred = model_obj.favorites.indexOf(Auth.current_user(req)) != -1;
-            var logged_in = Auth.current_user(req) != null;
+            var starred = model_obj.favorites.indexOf(Auth.current_user(req)) !== -1;
+            var logged_in = Auth.current_user(req) !== null;
 
             res.render('models/show', {model: model_obj
                                           ,model_URL: model_obj.grid_display
@@ -101,7 +101,7 @@ function get_model_edit(req, res){
             res.status(500).send('something_broke :(');
             return;
         }
-        if(Auth.current_user(req) == model_obj.creator){
+        if(Auth.current_user(req) === model_obj.creator){
             res.render("models/edit", {model: model_obj, model_URL:  model_obj.grid_display});
             return;
         }else{
@@ -126,7 +126,7 @@ function delete_model(req, res){
             else{
                 console.log("found the user!");
                 var index = user.uploads.indexOf(model_obj._id);
-                if(index != -1){
+                if(index !== -1){
                    user.uploads.splice(index, 1); 
                 }
                 user.save();
@@ -167,7 +167,7 @@ function toggle_star(req, res, increase){
         },
         function(model_obj, callback){
             var index = model_obj.favorites.indexOf(current_username);
-            if(index == -1 && increase)
+            if(index === -1 && increase)
             {
                 model_obj.favorites =  model_obj.favorites || [];
                 model_obj.favorites.push(current_username);

@@ -73,7 +73,7 @@ function get_show(req, res){
 
 // users/:username/edit GET
 function get_edit(req, res){
-    if(Auth.current_user(req) == req.params.username){
+    if(Auth.current_user(req) === req.params.username){
         User.find_by_name(req.params.username, function(err, result){
             console.log(result);
             res.render('users/edit', {user: result});
@@ -139,7 +139,7 @@ function get_image(req, res) {
 }
 
 function get_bank_info(req, res){
-    if(Auth.current_user(req) == req.params.username){
+    if(Auth.current_user(req) === req.params.username){
         res.render('users/bank_info', { });
     }
     else{
@@ -166,7 +166,7 @@ function post_bank_info(req, res){
         }
         else
         {
-            if(token["id"] != undefined)
+            if(token["id"] !== undefined)
             {
                 console.log(token["id"]);
                 stripe.recipients.create({
