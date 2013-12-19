@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 // Authentication Controller
 // * * * * * * * * * * 
 
@@ -26,6 +28,7 @@ function get_login(req, res) {
 
 // /login POST
 function post_login(req, res, serr) {
+    /*jshint unused: vars */
     res.redirect('/');
 }
 
@@ -35,10 +38,10 @@ function logout(req, res) {
     res.redirect('/');
 }
 module.exports = {
-    get_login: get_login
-    ,post_login: post_login
-    ,get_logout: logout
-    ,current_user: function(req) {
-        return req.session.passport.user || null
+    get_login: get_login,
+    post_login: post_login, 
+    get_logout: logout,
+    current_user: function(req) {
+        return req.session.passport.user || null;
     }
-}
+};
