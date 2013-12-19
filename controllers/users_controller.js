@@ -29,23 +29,27 @@ function post_register(req, res) {
     //stripe.setApiKey(global.keys.stripeSecretTest);
     
     user_model.register(new user_model({
-                                        username : req.body.username,
-                                        email: req.body.email}), 
-                                        req.body.password, 
-                                        function(err, account) {
-                        if (err) 
-                        {
-                            return res.render('users/register', { });
-                        }
-                        res.redirect('/');
-                        });
+        username : req.body.username,
+        email: req.body.email
+    }), 
+        req.body.password, 
+        function(err, account) {
+            /*jshint unused: vars */
+            if (err) 
+            {
+                return res.render('users/register', { });
+            }
+            res.redirect('/');
+        });
     
 }
 
 // users/:username GET
 function get_show(req, res){
     User.find_by_name(req.params.username, function(err, user_result){
-        if(err) console.log(err);
+        if(err) {
+            console.log(err);
+        }
         if(user_result)
         { 
             async.parallel([
@@ -60,14 +64,16 @@ function get_show(req, res){
                     });
                 }
 
-                ], function(err, results){
+            ], function(err, results){
                     console.log(err);
                     console.log(results);
                     res.render('users/show', {user: user_result, models: results[0], starred: results[1]});
                 }
             );
         }
-        else res.status(404).send('Not found');
+        else {
+            res.status(404).send('Not found');
+        }
     });
 }
 
@@ -80,7 +86,7 @@ function get_edit(req, res){
         });
     }
     else{
-        res.send("Not Authorized to perform this action. Sorry")
+        res.send("Not Authorized to perform this action. Sorry");
     }
 }
 
@@ -111,10 +117,10 @@ function post_upload_image(req, res) {
                     console.log(err);
                 }
                 else{
-                    console.log("Image saved!")
+                    console.log("Image saved!");
                     res.redirect("/");
                 }
-            })
+            });
         });
     });
 }
@@ -134,7 +140,7 @@ function get_image(req, res) {
         readstream.on('error', function(){
             console.log("prof pic not found. Sending default");
             res.sendfile(global.root_path + "/public/default-user-icon.png");
-        })
+        });
     });
 }
 
@@ -147,18 +153,68 @@ function get_bank_info(req, res){
     }
 }
 
+function update_recipient(user_obj, res, first_name, last_name, recipient) {
+    console.log(user_obj);
+    user_obj.firstname = first_name;
+    user_obj.lastname = last_name;
+    /*jshint sub: true */
+    user_obj.recipientid = recipient["id"];
+    user_obj.save(function(err){
+        if(err)
+        {
+            console.log(err);
+            res.status(500);
+            res.send("Server error");
+        }
+        else
+        {
+            res.redirect('/');
+        }
+    });
+}
+
+function handle_transaction(token, first_name, last_name, req, res) {
+
+    /*jshint sub: true */
+    if(token["id"] !== undefined)
+    {
+        console.log(token["id"]);
+        stripe.recipients.create({
+            name: first_name + " " + last_name,
+            type: "individual",
+            bank_account: token["id"],
+            email: req.body.email
+        }, 
+        function(err, recipient) {
+            if(err)
+            {
+                console.log(err);
+            }
+            else
+            {
+                console.log(recipient);
+                console.log("Hello There I reached here");
+                User.find_by_name(req.params.username, function(err, user_obj){
+                    update_recipient(user_obj, res, first_name, last_name, recipient);
+                });
+            }
+        });
+    }   
+}
+
 function post_bank_info(req, res){
     var first_name = req.body.firstname;
     var last_name = req.body.lastname;
     var routing_number = req.body.routingNumber;
     var account_number = req.body.accountNumber;
     var token = stripe.tokens.create({
-    bank_account: {
-                    country: 'US',
-                    routing_number: routing_number,
-                    account_number: account_number
-                  }
-    }, function(err, token) {
+        bank_account: {
+            country: 'US',
+            routing_number: routing_number,
+            account_number: account_number
+        }
+    }, 
+    function(err, token) {
         if(err)
         {
             console.log("ERROR");
@@ -166,47 +222,7 @@ function post_bank_info(req, res){
         }
         else
         {
-            if(token["id"] !== undefined)
-            {
-                console.log(token["id"]);
-                stripe.recipients.create({
-                                        name: first_name + " " + last_name,
-                                        type: "individual",
-                                        bank_account: token["id"],
-                                        email: req.body.email
-                }, function(err, recipient) 
-                {
-                    if(err)
-                    {
-                        console.log(err);
-                    }
-                    else
-                    {
-                        console.log(recipient);
-                        console.log("Hello There I reached here");
-                        User.find_by_name(req.params.username, function(err, user_obj){
-                            console.log(user_obj);
-                            user_obj.firstname = first_name;
-                            user_obj.lastname = last_name;
-                            user_obj.recipientid = recipient["id"];
-                            user_obj.save(function(err){
-                                if(err)
-                                {
-                                    console.log(err);
-                                    res.status(500);
-                                    res.send("Server error");
-                                }
-                                else
-                                {
-                                    res.redirect('/');
-                                }
-                            });
-                        });
-                    }
-
-                });
-                
-            }   
+            handle_transaction(token, first_name, last_name, req, res);
         }
     });
 
