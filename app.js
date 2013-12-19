@@ -1,7 +1,6 @@
 /*jslint node: true */
 "use strict";
-var url = require('url');
-var passport = require('passport')
+var passport = require('passport');
 //#express
 var express = require('express');
 var app = express();
@@ -9,12 +8,12 @@ var app = express();
 //------------------------------------------
 
 // # Setup Views
-app.set('views', __dirname + '/views')
-app.set('view engine', 'jade')
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
 // ----------------------
 
 // #Session stuff:
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/public'));
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 
@@ -24,39 +23,31 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.configure(function(){
-  //...
-  app.use(function(req, res, next){
-    res.locals.passport = req.session.passport;
-    next();
-  });
+    //...
+    app.use(function(req, res, next){
+        res.locals.passport = req.session.passport;
+        next();
+    });
 });
 
 //--------------------------------
 
 // # Controllers:
-// 	This is where the controllers are defined
+// This is where the controllers are defined
 var models_controller = require('./controllers/models_controller');
 var navigation_controller = require('./controllers/navigation_controller');
 var authentication_controller = require('./controllers/authentication_controller');
 var users_controller = require('./controllers/users_controller');
 
-// -----------------------
-
-// # Models:
-// 	This is where the model schemas are defined
-var model3d = require('./models/model3d_schema');
-// -----------------------
-
-
 // #DB# :
-// 	Set Up Data Base and pass it to all routes
+// Set Up Data Base and pass it to all routes
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/mmdb');
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  console.log("mongo open");
+    console.log("mongo open");
 });
 
 global.root_path = __dirname;
@@ -70,15 +61,15 @@ app.all('*', function(request, response, next)
 
 var fs = require('fs');
 var keysfile = __dirname + '/keys.json';
- 
+
 fs.readFile(keysfile, 'utf8', function (err, data) {
-  if (err) {
-    console.log('Error reading keys!: ' + err);
-    return;
-  }
- 
-  data = JSON.parse(data);
-  global.keys = data;
+    if (err) {
+        console.log('Error reading keys!: ' + err);
+        return;
+    }
+
+    data = JSON.parse(data);
+    global.keys = data;
 });
 
 // #Routes
