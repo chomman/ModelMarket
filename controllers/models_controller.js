@@ -303,4 +303,4 @@ module.exports = {
     post_buy: post_buy,
     post_star: post_star,
     post_unstar: post_unstar
-}
+};
