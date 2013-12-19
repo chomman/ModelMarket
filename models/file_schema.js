@@ -2,8 +2,6 @@
 "use strict";
 var mongoose = require('mongoose');
 var fs = require('fs'); 
-var Model3d = require('./../models/model3d_schema'); 
-var File = require('./../models/file_schema'); 
 
 var Grid = require("gridfs-stream");
 Grid.mongo = mongoose.mongo;
@@ -28,7 +26,7 @@ module.exports.put_file_into_database = function(locationOnDisk, callback) {
         console.log("write file finished");
         callback(null, gridfile._id);
     });
-}
+};
 
 
 /* ----------------------------------------------------
@@ -36,9 +34,9 @@ module.exports.put_file_into_database = function(locationOnDisk, callback) {
 // @gridfs_id : the id of the file in the gridfs database
 // @callback (err) : a callback that takes an error
 */
- module.exports.delete_file = function(gridfs_id, callback) {
+module.exports.delete_file = function(gridfs_id, callback) {
     var gridfs = Grid(conn.db);
-    gridfs.remove({_id : gridfs_id}, function() {
+    gridfs.remove({_id : gridfs_id}, function(err) {
         if (err) {
             console.log(err);
             callback(err);
@@ -47,11 +45,11 @@ module.exports.put_file_into_database = function(locationOnDisk, callback) {
             callback(err);
         }
     });
-}
+};
 
 
 
 module.exports.get_readstream_id = function(id){
     var gfs = Grid(conn.db);
     return gfs.createReadStream({_id : id});
-}
+};
