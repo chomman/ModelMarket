@@ -1,7 +1,6 @@
-"use strict"
+/*jslint node: true */
+"use strict";
 var mongoose = require('mongoose');
-
-var File = require('./file_schema');
 
 var modelSchema = new mongoose.Schema({
     name: {
@@ -42,23 +41,34 @@ module.exports = {
 };
 module.exports.find_by_name = function(name, callback){
     db_model.findOne({name : name}, function(err,obj) {
-        if(err) callback(err ,null);
-        else callback(err,obj);
+        if(err) {
+            callback(err ,null);
+        }
+        else {
+            callback(err,obj);
+        }
     });
-  };
+};
 
 module.exports.find_by_id = function(id, callback){
     db_model.findOne({_id : id}, function(err,obj) {
-        if(err) callback(err , null);
-        else callback(err, obj);
+        if(err) {
+            callback(err , null);
+        }
+        else {
+            callback(err, obj);
+        }
     });
-  };
+};
 
 module.exports.find_by_string = (function(query, callback) {
-    var tokens = query.split();
     var re = new RegExp(query, "i");
     db_model.find({name: re}, function(err, docs) {
-        if(err) callback(err , null);
-        else callback(err, docs);
+        if(err) {
+            callback(err , null);
+        }
+        else {
+            callback(err, docs);
+        }
     });
 });
