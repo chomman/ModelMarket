@@ -208,11 +208,44 @@ function get_buy(req, res){
     //res.render('models/buy', {});
 }
 
-function transfer_money_to_creator() {
+function create_transfer(user_obj, amount) {
+    var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
+        if(err){
+            console.log(err);
+        }else{
+            stripe.transfers.create({
+                    amount: amount,
+                    currency: "usd",
+                    /*jshint sub: true */
+                    recipient: recipient["id"],
+                    description: "Transfer for test@example.com"
+                }, 
+                function(err, transfer) {
+                    if(err){
+                        console.log(err);
+                    }else{
+                        console.log(transfer);
+                    }
+                });
+        }
+    });
+}
+
+function transfer_money_to_creator(err, user_obj, amount) {
+    if(err){
+        console.log(err);
+    }
+    else{
+        if(!user_obj.recipientid){
+            console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
+        }
+        else {
+            create_transfer(user_obj, amount);
+        }
+    }
 }
 
 function charge_captured(charge, res_message, req, res, amount) {
-
     /*jshint sub: true */
     if(charge["captured"]) {
         res_message = "Your payment has been successful.";
@@ -224,45 +257,15 @@ function charge_captured(charge, res_message, req, res, amount) {
                 res.send('something_broke :(');
             }
             else{
-                //console.log(obj);
                 var creator = obj.creator;
                 User.find_by_name(creator, function(err, user_obj){
-                    transfer_money_to_creator();
-                    if(err){
-                        console.log(err);
-                    }
-                    else{
-                        if(!user_obj.recipientid){
-                            console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
-
-                        }else{
-                            var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
-                                if(err){
-                                    console.log(err);
-                                }else{
-                                    //console.log(recipient);
-                                    stripe.transfers.create({
-                                            amount: amount,
-                                            currency: "usd",
-                                            recipient: recipient["id"],
-                                            description: "Transfer for test@example.com"}
-                                        ,function(err, transfer) {
-                                            if(err){
-                                                console.log(err);
-                                            }else{
-                                                console.log(transfer);
-                                            }
-                                    });
-                                }
-                            });
-                        }
-                    }
+                    transfer_money_to_creator(err, user_obj, amount);
                 });
                 res.render('models/buy', {name: obj.name,
-                        description: obj.description,
-                        price: obj.price,
-                        id: obj._id,
-                        message: res_message});
+                                        description: obj.description,
+                                        price: obj.price,
+                                        id: obj._id,
+                                        message: res_message});
             }
         });
     }
@@ -284,16 +287,15 @@ function post_buy(req, res){
         card: stripeToken,
         description: "description"
     }, function(err, charge) {
-        if (err && err.type === 'StripeCardError') {
-            console.log("ERROR");
-            console.log(err);
+            if (err && err.type === 'StripeCardError') {
+                console.log("ERROR");
+                console.log(err);
+            }
+            else {
+                charge_captured(charge, res_message, req, res, amount);
+            }
         }
-        else {
-            charge_captured(charge, res_message, req, res, amount);
-        }
-        }
-    });
-    
+    );
 }
 
 // models/uploads/:id
