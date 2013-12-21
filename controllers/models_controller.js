@@ -36,10 +36,10 @@ function post_new(req, res){
     console.log(req.files.model.path);
     console.log(Auth.current_user(req));
 
-    var new_model3d = new Model3d.model({name : req.body.name || "undefined"
-                                        ,description: req.body.description || "no description"
-                                        ,price: parseFloat(req.body.price) || 0.0
-                                        ,creator: Auth.current_user(req)
+    var new_model3d = new Model3d.model({name : req.body.name || "undefined",
+                                        description: req.body.description || "no description",
+                                        price: parseFloat(req.body.price) || 0.0,
+                                        creator: Auth.current_user(req)
                                         });
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
@@ -56,7 +56,10 @@ function post_new(req, res){
         {
             new_model3d.grid_files.push(gridfs_id);
             new_model3d.grid_display = gridfs_id;
-            new_model3d.save(function(err){
+            new_model3d.save(function(err) {
+                if (err) {
+                    console.log(err);
+                }
                 res.redirect("/");
             });
         } 
@@ -67,31 +70,31 @@ function post_new(req, res){
 // models/:id GET
 function get_show(req, res){
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        if(err) res.status(501).send('something_broke :(');
+        if(err) {
+            res.status(501).send('something_broke :(');
+        }
         else
         {
             console.log(model_obj);
             model_obj.views = model_obj.views + 1; 
-            var parent_id = model_obj._id;
             var should_show_edit = (Auth.current_user(req) === model_obj.creator);
             var starred = model_obj.favorites.indexOf(Auth.current_user(req)) !== -1;
             var logged_in = Auth.current_user(req) !== null;
 
-            res.render('models/show', {model: model_obj
-                                          ,model_URL: model_obj.grid_display
-                                          , description: model_obj.description
-                                          , show_edit: should_show_edit
-                                          , starred: starred
-                                          , logged_in: logged_in
-                                          , keys: global.keys});
+            res.render('models/show', {model: model_obj,
+                                       model_URL: model_obj.grid_display,
+                                       description: model_obj.description,
+                                       show_edit: should_show_edit,
+                                       starred: starred,
+                                       logged_in: logged_in,
+                                       keys: global.keys});
             //save the model becasue we updated how many views it had
-            model_obj.save(function(err){
+            model_obj.save(function(err) {
                 console.log(err);
             });
         } 
     });
 }
-
 
 // models/:id/edit GET
 function get_model_edit(req, res){
@@ -127,14 +130,13 @@ function delete_model(req, res){
                 console.log("found the user!");
                 var index = user.uploads.indexOf(model_obj._id);
                 if(index !== -1){
-                   user.uploads.splice(index, 1); 
+                    user.uploads.splice(index, 1); 
                 }
                 user.save();
                 model_obj.remove();
                 res.send("done");
             }
         });
-
     });
 }
 
@@ -153,17 +155,19 @@ function post_unstar(req, res){
 //@param increase: (bool) to increase or decrease the star cound for this model
 function toggle_star(req, res, increase){
     //star button should not even apear if user isnt logged in
-    var current_username = Auth.current_user(req)
+    var current_username = Auth.current_user(req);
     if(!current_username){
         res.status(403).send("hacking?");
         return;
     }
     async.waterfall([
         function(callback){
-             Model3d.find_by_id(req.params.id, function(err, model_obj){
-                if(err) callback(err);
+            Model3d.find_by_id(req.params.id, function(err, model_obj){
+                if(err) {
+                    callback(err);
+                }
                 callback(err, model_obj);
-             });
+            });
         },
         function(model_obj, callback){
             var index = model_obj.favorites.indexOf(current_username);
@@ -182,98 +186,116 @@ function toggle_star(req, res, increase){
     ],function (err, num_stars) {
         console.log("got this far");
 
-        if(!err) res.status(200).send(" " + num_stars);
-        else res.status(500).send();
+        if(!err) {
+            res.status(200).send(" " + num_stars);
+        }
+        else {
+            res.status(500).send();
+        }
     });
 }
 
 
 function get_buy(req, res){
     Model3d.find_by_id(req.params.id, function(err, obj){
-        if(err) res.render('something_broke :(');
-        else res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
+        if(err) {
+            res.render('something_broke :(');
+        }
+        else {
+            res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
+        }
     });
     //res.render('models/buy', {});
 }
+
+function create_transfer(user_obj, amount) {
+    var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
+        if(err){
+            console.log(err);
+        }else{
+            stripe.transfers.create({
+                    amount: amount,
+                    currency: "usd",
+                    /*jshint sub: true */
+                    recipient: recipient["id"],
+                    description: "Transfer for test@example.com"
+                }, 
+                function(err, transfer) {
+                    if(err){
+                        console.log(err);
+                    }else{
+                        console.log(transfer);
+                    }
+                });
+        }
+    });
+}
+
+function transfer_money_to_creator(err, user_obj, amount) {
+    if(err){
+        console.log(err);
+    }
+    else{
+        if(!user_obj.recipientid){
+            console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
+        }
+        else {
+            create_transfer(user_obj, amount);
+        }
+    }
+}
+
+function charge_captured(charge, res_message, req, res, amount) {
+    /*jshint sub: true */
+    if(charge["captured"]) {
+        res_message = "Your payment has been successful.";
+        console.log("Made charge");
+        console.log(req.params.id);
+        Model3d.find_by_id(req.params.id, function(err, obj){
+            if(err){
+                console.log(err); 
+                res.send('something_broke :(');
+            }
+            else{
+                var creator = obj.creator;
+                User.find_by_name(creator, function(err, user_obj){
+                    transfer_money_to_creator(err, user_obj, amount);
+                });
+                res.render('models/buy', {name: obj.name,
+                                        description: obj.description,
+                                        price: obj.price,
+                                        id: obj._id,
+                                        message: res_message});
+            }
+        });
+    }
+    else{
+        res_message = "Your payment has been unsuccessful.";
+        console.log("No charge");
+    }
+}
+
 function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey(global.keys.stripeSecretTest);
     var res_message;
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
-    var currency = req.body.currency;
-    var description = req.body.description;
     var charge = stripe.charges.create({
         amount: amount, // amount in cents, again
         currency: "usd",
         card: stripeToken,
         description: "description"
     }, function(err, charge) {
-        if (err && err.type === 'StripeCardError') {
-            console.log("ERROR");
-            console.log(err);
-        }
-        else
-        {
-            if(charge["captured"])
-            {
-                res_message = "Your payment has been successful."
-                console.log("Made charge");
-                console.log(req.params.id);
-                Model3d.find_by_id(req.params.id, function(err, obj){
-                    if(err){
-                        console.log(err); 
-                        res.send('something_broke :(');
-                    }
-                    else{
-                        //console.log(obj);
-                        var creator = obj.creator;
-                        User.find_by_name(creator, function(err, user_obj){
-                            if(err){
-                                console.log(err);
-                            }
-                            else{
-                                if(!user_obj.recipientid){
-                                    console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
-
-                                }else{
-                                    var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
-                                        if(err){
-                                            console.log(err);
-                                        }else{
-                                            //console.log(recipient);
-                                            stripe.transfers.create({
-                                                        amount: amount,
-                                                        currency: "usd",
-                                                        recipient: recipient["id"],
-                                                        description: "Transfer for test@example.com"}
-                                                    ,function(err, transfer) {
-                                                        if(err){
-                                                            console.log(err);
-                                                        }else{
-                                                            console.log(transfer);
-                                                        }
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                        res.render('models/buy', {name: obj.name,
-                                                   description: obj.description,
-                                                   price: obj.price,
-                                                   id: obj._id,
-                                                   message: res_message});
-                        }
-                });
+            if (err && err.type === 'StripeCardError') {
+                console.log("ERROR");
+                console.log(err);
             }
-            else{
-                res_message = "Your payment has been unsuccessful."
-                console.log("No charge");
+            else {
+                charge_captured(charge, res_message, req, res, amount);
             }
         }
-    });
-    
+    );
 }
 
 // models/uploads/:id
@@ -286,7 +308,8 @@ function get_file(req, res) {
             return;
         }
         var readstream = gridfs.createReadStream({_id : model_obj.grid_display});
-        console.log("readstream : " + readstream);
+        console.log("readstream in models/uploads :");
+        console.log(readstream);
         res.header('Content-Type', 'plain/text');
         readstream.pipe(res);
     });

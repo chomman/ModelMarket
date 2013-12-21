@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 var mongoose = require('mongoose');
 var passportLocalMongoose = require('passport-local-mongoose');
 
@@ -41,9 +43,8 @@ var db_model = mongoose.model('User', userSchema);
 
 // username
 // callback(err, obj)
-
 module.exports.find_by_name = function(username, callback){
     db_model.findOne({username: username}, callback);
-}
+};
 
-module.exports.model = db_model
+module.exports.model = db_model;
