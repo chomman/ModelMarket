@@ -1,3 +1,5 @@
+/*jslint node: true */
+"use strict";
 var gl;
 var scene;
 var xoff = 0;
@@ -12,9 +14,6 @@ var modelTextureLoaded = false;
 var modelTexture2Loaded = false;
 
 var zoom = -8;
-
-
-
 
 /***************************************************************/
 /*---------------------------SHADERS---------------------------*/
@@ -33,17 +32,16 @@ function getShader(gl, id) {
     currentChild = shaderScript.firstChild;
 
     while(currentChild) {
-        if (currentChild.nodeType == currentChild.TEXT_NODE) {
+        if (currentChild.nodeType === currentChild.TEXT_NODE) {
             theSource += currentChild.textContent;
         }
 
         currentChild = currentChild.nextSibling;
     }
 
-    var shader;
-    if (shaderScript.type == "x-shader/x-fragment") {
+    if (shaderScript.type === "x-shader/x-fragment") {
         shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (shaderScript.type == "x-shader/x-vertex") {
+    } else if (shaderScript.type === "x-shader/x-vertex") {
         shader = gl.createShader(gl.VERTEX_SHADER);
     } else {
         return null;
@@ -229,9 +227,9 @@ function webGLStart() {
 }
 
 function initScene(){
-    scene = new Object();
-    scene.vertices = new Array();
-    scene.faces = new Array();
+    scene = {};
+    scene.vertices = [];
+    scene.faces = [];
 }
 
 function initMouseGestures() {
@@ -258,8 +256,8 @@ function initMouseGestures() {
             var ydiff = event.offsetY - coord.y;
             coord.y = event.offsetY;
             coord.x = event.offsetX;
-            xoff += .01*xdiff;
-            yoff += .01*ydiff;
+            xoff += 0.01*xdiff;
+            yoff += 0.01*ydiff;
             //zoom += .1*ydiff;
         }
 
@@ -285,7 +283,8 @@ function tick(){
 
 var lastTime = 0;
 function animate() {
-var timeNow = new Date().getTime();
+    var timeNow = new Date().getTime();
+
     if (lastTime != 0) {
         var elapsed = timeNow - lastTime;
         //xoff += (1 * elapsed) / 1000.0;
@@ -339,8 +338,8 @@ function finishedModelDownload(data){
 
     var text= String(data);
     var lines = text.split(/\n/);
-    normalAccumilator = new Array();
-    scene.vertices = new Array();
+    normalAccumilator = [];
+    scene.vertices = [];
     console.log("start parsing");
 
 
@@ -348,7 +347,7 @@ function finishedModelDownload(data){
 
         var line = lines[i].trim();
 
-        if(line[0] == "v" && line[1] == " "){
+        if(line[0] === "v" && line[1] === " "){
             //found vertex
             var elems = line.split(/\s+/g);
             if(elems.length > 4){
@@ -367,7 +366,7 @@ function finishedModelDownload(data){
                 normalAccumilator.push(vec3.create());
             }
         }
-        else if(line[0] == "f" && line[1] == " "){
+        else if(line[0] === "f" && line[1] === " ") {
             var elems = line.split(/\s+/g);
             if(elems.length < 4){
                 console.log("face was messed up: " + line);
@@ -438,25 +437,25 @@ function finishedModelDownload(data){
     gl.bindBuffer(gl.ARRAY_BUFFER, modelVertexTextureBuffer);
     var textureCoords = [
       // Front face
-      0.0, 0.9,
-      0.1, 0.95,
-      0.15, 1.0,
-      0.2, 0.8,
-      0.25, 0.85,
-      0.3, 0.4,
-      0.35, 0.5,
-      0.4, 0.55,
-      0.45, 0.33,
-      0.5, 0.7,
-      0.6, 0.45,
-      0.65, 0.2,
-      0.7, 0.75,
-      0.75, 0.25,
-      0.8, 0.1,
-      0.85, 0.15,
-      0.9, 0.05,
-      0.95, 0.7,
-      1.0, 0.67
+        0.0, 0.9,
+        0.1, 0.95,
+        0.15, 1.0,
+        0.2, 0.8,
+        0.25, 0.85,
+        0.3, 0.4,
+        0.35, 0.5,
+        0.4, 0.55,
+        0.45, 0.33,
+        0.5, 0.7,
+        0.6, 0.45,
+        0.65, 0.2,
+        0.7, 0.75,
+        0.75, 0.25,
+        0.8, 0.1,
+        0.85, 0.15,
+        0.9, 0.05,
+        0.95, 0.7,
+        1.0, 0.67
     ];
     var texture = [];
     for(var i = 0; i < scene.vertices.length/3; i++){
@@ -495,6 +494,7 @@ function getModelFromFile(modelURL){
             xhr: function() {
                 var req = originalXhr(), that = this;
                 if (req) {
+                    /*jslint eqeq: true*/
                     if (typeof req.addEventListener == "function") {
                         req.addEventListener("progress", function(evt) {
                             that.progress(evt);
@@ -510,12 +510,12 @@ function getModelFromFile(modelURL){
         url: modelURL,
         type: "GET",
         dataType: "text/html",
-        success: function() { console.log("hello?")},
+        success: function() {console.log("hello?");},
         complete: function(data) {
             $('#loaderbar').width(canvas.width()).animate({
                 height: '0px',
                 opacity: '0'
-                }, 500);
+            }, 500);
             finishedModelDownload(data.responseText);
 
         },

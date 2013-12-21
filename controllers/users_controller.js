@@ -134,8 +134,6 @@ function get_image(req, res) {
         }
         var readstream =  File.get_readstream_id(user.imageid);
         console.log(readstream);
-
-        console.log("readstream : " + readstream);
         readstream.pipe(res);
         readstream.on('error', function(){
             console.log("prof pic not found. Sending default");
