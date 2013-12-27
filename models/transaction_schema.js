@@ -22,17 +22,17 @@ var transactionSchema = new mongoose.Schema({
     data_transfered: {
         type: Date,
     },
-    purchase_user: {
-        type: mongoose.Schema.Types.ObjectId,
+    purchase_username: {
+        type: String,
         index: true
     },
-    model_owner {
-        type: mongoose.Schema.Types.ObjectId,
+    model_owner_username: {
+        type: String,
         index: true
     }
 });
 
-var db_model = mongoose.model('User', userSchema);
+var db_model = mongoose.model('Transaction', transactionSchema);
 
 // username
 // callback(err, obj)
