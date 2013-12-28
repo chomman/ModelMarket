@@ -46,9 +46,11 @@ function post_register(req, res) {
 
 // users/:username GET
 function get_show(req, res){
+    var looking_at_own_profile = (Auth.current_user(req) === req.params.username);
     User.find_by_name(req.params.username, function(err, user_result){
         if(err) {
-            console.log(err);
+            console.error(err);
+            res.status(501).send('Something went wrong :(');
         }
         if(user_result)
         { 
@@ -67,7 +69,7 @@ function get_show(req, res){
             ], function(err, results){
                     console.log(err);
                     console.log(results);
-                    res.render('users/show', {user: user_result, models: results[0], starred: results[1]});
+                    res.render('users/show', {user: user_result, models: results[0], starred: results[1], looking_at_own_profile: looking_at_own_profile});
                 }
             );
         }
@@ -79,6 +81,19 @@ function get_show(req, res){
 
 // users/:username/edit GET
 function get_edit(req, res){
+    if(Auth.current_user(req) === req.params.username){
+        User.find_by_name(req.params.username, function(err, result){
+            console.log(result);
+            res.render('users/edit', {user: result});
+        });
+    }
+    else{
+        res.send("Not Authorized to perform this action. Sorry");
+    }
+}
+
+// users/:username/purchases GET
+function get_purchases(req, res){
     if(Auth.current_user(req) === req.params.username){
         User.find_by_name(req.params.username, function(err, result){
             console.log(result);
@@ -226,6 +241,7 @@ function post_bank_info(req, res){
 
 }
 
+
 module.exports = {
     get_register: get_register,
     post_register: post_register,
@@ -236,5 +252,7 @@ module.exports = {
     post_upload_image: post_upload_image,
     get_image: get_image,
     get_bank_info: get_bank_info,
-    post_bank_info: post_bank_info
+    post_bank_info: post_bank_info,
+
+
 };
