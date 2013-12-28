@@ -8,6 +8,7 @@ var transactionSchema = new mongoose.Schema({
         index: true
     },
     model_cost: Number,
+    after_stripe_fees: Number,
     money_recieved: { //this refers to the money being recieved by us but not yet transfered to the creator yet
         type: Boolean,
         default: false
@@ -29,6 +30,10 @@ var transactionSchema = new mongoose.Schema({
     model_owner_username: {
         type: String,
         index: true
+    },
+    aborted: {
+        type: Boolean,
+        default: false
     }
 });
 
