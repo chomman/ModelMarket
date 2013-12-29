@@ -7,6 +7,7 @@ var transactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         index: true
     },
+    description: String,
     model_cost: Number,
     after_stripe_fees: Number,
     money_recieved: { //this refers to the money being recieved by us but not yet transfered to the creator yet
@@ -40,9 +41,11 @@ var transactionSchema = new mongoose.Schema({
 var db_model = mongoose.model('Transaction', transactionSchema);
 
 // username
-// callback(err, obj)
-module.exports.find_by_name = function(username, callback){
-    db_model.findOne({username: username}, callback);
-};
+// callback(err, transaction)
+module.exports.find_transaction_for_user_model = function(username, model_id, callback){
+    db_model.findOne({model_id:model_id
+                     ,money_recieved: true
+                     ,aborted: false}, callback);
+}
 
 module.exports.model = db_model;

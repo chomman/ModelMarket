@@ -7,6 +7,8 @@ var File = require('./../models/file_schema');
 var User = require('./../models/user_schema');
 var user_model = User.model;
 var Auth = require('./authentication_controller');
+var Transaction = require('./../models/transaction_schema');
+
 var async = require('async');
 
 var stripe = require("stripe")(
@@ -241,6 +243,29 @@ function post_bank_info(req, res){
 
 }
 
+function get_purchases(req, res){
+    console.log("some shit");
+    if(!Auth.current_user(req)){
+        res.redirect("/login");
+        return;
+    }
+    if(Auth.current_user(req) != req.params.username){
+        res.send("you are not authorized to view this page!!");
+        return;
+    }
+    var username =  req.params.username;
+    Transaction.model.find({aborted: false, purchase_username: username, money_recieved: true}, function(err, transactions){
+        if(err){
+            console.error(err);
+            return;
+        }else{
+            console.log(transactions);
+            console.log("number of transactions: " + transactions.length);
+            res.render("users/purchases", {transactions: transactions});
+        }
+    });
+}
+
 
 module.exports = {
     get_register: get_register,
@@ -253,6 +278,5 @@ module.exports = {
     get_image: get_image,
     get_bank_info: get_bank_info,
     post_bank_info: post_bank_info,
-
-
+    get_purchases: get_purchases
 };

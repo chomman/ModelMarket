@@ -1,0 +1,13 @@
+extends ../layout
+include ../mixins
+block content
+    
+    div
+        h2 Models you own:
+        if transactions
+            table.pure-table.pure-table-bordered
+                mixin purchase_link_row_header()
+                -each t in transactions
+                    mixin purchase_link_row(t.description, "/models/"+t.model_id+"/buy", t.date_recieved.toISOString().replace(/T/, ' ').replace(/\..+/, ''), t.model_cost) 
+        else
+            | You havent made any purchases yet. :(

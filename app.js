@@ -78,6 +78,9 @@ app.get('/about', navigation_controller.get_about);
 app.get('/search', navigation_controller.get_search);
 app.post('/search', navigation_controller.post_search);
 
+app.get('/logout', authentication_controller.get_logout);
+app.get('/login', authentication_controller.get_login);
+app.post('/login', passport.authenticate('local'), authentication_controller.post_login);
 
 app.get('/models/new', models_controller.get_new);
 app.post('/models/new', models_controller.post_new);
@@ -90,10 +93,6 @@ app.post('/models/:id/star', models_controller.post_star);
 app.post('/models/:id/unstar', models_controller.post_unstar);
 app.get('/models/uploads/:id', models_controller.get_file);
 
-app.get('/logout', authentication_controller.get_logout);
-app.get('/login', authentication_controller.get_login);
-app.post('/login', passport.authenticate('local'), authentication_controller.post_login);
-
 app.get('/users/register', users_controller.get_register);
 app.post('/users/register', users_controller.post_register);
 app.get('/users/:username', users_controller.get_show);
@@ -104,6 +103,8 @@ app.get('/users/:username/image', users_controller.get_image);
 app.del('/users/:username', users_controller.del);
 app.get('/users/:username/bank_info', users_controller.get_bank_info);
 app.post('/users/:username/bank_info', users_controller.post_bank_info);
+app.get('/users/:username/purchases', users_controller.get_purchases);
+
 
 console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);

@@ -1,13 +1,16 @@
 extend ../layout
 block content
     p
-        | You have successfully purchased #{name}. #{description}. The price of this model is #{price} USD.
+        | You have successfully purchased #{model.name}. 
+    p
+        | #{model.description}
+    p
+        | The price of this model was #{transaction.model_cost} USD.
 
     p 
-        | You will be billed #{price} USD + taxes. You can download the file below.
-        | #{message}
+        | You were billed #{transaction.model_cost} USD + taxes. You can download the file below.
     div
-        form(method="get", action="/models/uploads/#{id}")
+        form(method="get", action="/models/uploads/#{transaction.model_id}")
             button(class="pure-button pure-button-primary", type="submit")
                 |Download
       

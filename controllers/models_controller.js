@@ -207,18 +207,42 @@ function toggle_star(req, res, increase){
     });
 }
 
-
+//GET models/:id/buy
 function get_buy(req, res){
-    Model3d.find_by_id(req.params.id, function(err, obj){
-        if(err) {
-            res.render('something_broke :(');
+    var model_id = req.params.id;
+    if(!Auth.current_user(req)){
+        res.status(401).redirect("/login");
+        return;
+    }
+    async.parallel([
+
+        function(callback){
+            Model3d.find_by_id(model_id, callback);
+        },
+        function(callback){
+            Transaction.find_transaction_for_user_model(Auth.current_user(req), model_id, callback);
+        }],
+
+        function(err, results){
+            console.log(results);
+            if(err){
+                console.error(err);
+                res.status(501).send("Something went wrong :(");
+                return;
+            }
+            var modelobj = results[0];
+            var transaction = results[1];
+            if(!modelobj || !transaction){
+                console.error("download link failed");
+                console.error(err);
+                res.status(501).send("Something went wrong :(");
+                return;
+            }
+            res.render("models/buy", {transaction: transaction, model: modelobj});
         }
-        else {
-            res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
-        }
-    });
-    //res.render('models/buy', {});
+    );
 }
+
 
 function stripe_make_charge(amount, currency, card_token, description, callback){
     stripe.charges.create({
@@ -229,7 +253,8 @@ function stripe_make_charge(amount, currency, card_token, description, callback)
         }, callback);
 }
 
-// POST sent from the stripe front end module
+// POST models/:id/buy 
+// sent from the stripe front end module
 function post_buy(req, res){
     if(!Auth.current_user(req)){
         res.send("need to login to purchase models!");
@@ -245,8 +270,8 @@ function post_buy(req, res){
     var transaction = new Transaction.model({model_id: req.params.id
                                             ,purchase_username: Auth.current_user(req)});
     var model_ref;
-    
-    //does each of these steps async
+
+    //does each of these steps async and passes the result to the next step
     async.waterfall([
         function(callback){
             Model3d.model.findById(transaction.model_id, callback);
@@ -257,11 +282,12 @@ function post_buy(req, res){
             transaction.model_owner_username = model3d.creator;
             transaction.model_cost = model3d.price;
             var description = model3d.name + " by " + model3d.creator;
+            transaction.description = description;
             stripe_make_charge(amount, "usd", stripeToken, description, callback);
         },
         function(charge, callback){
             console.log("charge successful");
-            console.log(charge)
+            //console.log(charge)
             transaction.date_recieved = Date.now();
             transaction.money_recieved = true;
             transaction.save(callback);
@@ -284,11 +310,7 @@ function post_buy(req, res){
             //check if the model owner has a high enough balance to be payed
             User.resolve_transfers_for_username(transaction.model_owner_username);
             //render the download page to the user who purchased the model
-            res.render('models/buy', {name: model_ref.name,
-                                      description: model_ref.description,
-                                      price: model_ref.price,
-                                      id: model_ref._id,
-                                      message: 'You successfuly purchased this model. You can download this model at any time by visiting your profile and clicking on "my puchases"'});
+            res.redirect("/models/"+model_ref._id+"/buy");
 
         }
     });
