@@ -2,10 +2,11 @@ extends ../layout
 include ../mixins
 block content
     if(looking_at_own_profile)
-            div.mm-profile-button-row
-                a.pure-button.mm-button-row(href="/users/#{user.username}/edit") Edit Profile
-                a.pure-button.mm-button-row(href="/users/#{user.username}/bank_info") Add Bank Info
-                a.pure-button.mm-button-row(href="/users/#{user.username}/purchases") My Purchases
+        div.mm-profile-button-row
+            a.pure-button.mm-button-row(href="/users/#{user.username}/purchases") My Purchases
+            a.pure-button.mm-button-row(href="/users/#{user.username}/edit") Edit Profile
+            a.pure-button.mm-button-row(href="/users/#{user.username}/bank_info") Add Bank Info
+            a.pure-button.mm-button-row(href="/users/#{user.username}/payments") Payment Records
     h2 #{user.username}
     div.circular(style="background: url(/users/#{user.username}/image) no-repeat; background-size: cover; margin-left:0")
 

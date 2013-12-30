@@ -305,9 +305,8 @@ function post_buy(req, res){
 
         }
     });
-
-    
 }
+
 // models/uploads/:id
 function get_file(req, res) {
     var gridfs = Grid(conn.db);

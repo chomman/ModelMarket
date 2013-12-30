@@ -104,6 +104,7 @@ app.del('/users/:username', users_controller.del);
 app.get('/users/:username/bank_info', users_controller.get_bank_info);
 app.post('/users/:username/bank_info', users_controller.post_bank_info);
 app.get('/users/:username/purchases', users_controller.get_purchases);
+app.get('/users/:username/payments', users_controller.get_payments);
 
 
 console.log("running on port: " + (process.env.PORT || 3000));

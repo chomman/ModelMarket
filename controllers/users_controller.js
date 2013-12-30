@@ -243,18 +243,14 @@ function post_bank_info(req, res){
 
 }
 
+//GET users/:username/purchases
 function get_purchases(req, res){
-    console.log("some shit");
-    if(!Auth.current_user(req)){
-        res.redirect("/login");
-        return;
-    }
     if(Auth.current_user(req) != req.params.username){
         res.send("you are not authorized to view this page!!");
         return;
     }
-    var username =  req.params.username;
-    Transaction.model.find({aborted: false, purchase_username: username, money_recieved: true}, function(err, transactions){
+    var username = req.params.username;
+    Transaction.model.find({aborted: false, purchase_username: username, money_recieved: true}).sort('-date_recieved').exec(function(err, transactions){
         if(err){
             console.error(err);
             return;
@@ -262,6 +258,25 @@ function get_purchases(req, res){
             console.log(transactions);
             console.log("number of transactions: " + transactions.length);
             res.render("users/purchases", {transactions: transactions});
+        }
+    });
+}
+
+//GET users/:username/payments
+function get_payments(req, res){
+    if(Auth.current_user(req) != req.params.username){
+        res.send("you are not authorized to view this page!!");
+        return;
+    }
+    var username = req.params.username;
+    Transaction.model.find({aborted: false, model_owner_username: username, money_recieved: true}).sort('-date_recieved').exec(function(err, transactions){
+        if(err){
+            console.error(err);
+            return;
+        }else{
+            console.log(transactions);
+            console.log("number of transactions: " + transactions.length);
+            res.render("users/payments", {transactions: transactions});
         }
     });
 }
@@ -278,5 +293,6 @@ module.exports = {
     get_image: get_image,
     get_bank_info: get_bank_info,
     post_bank_info: post_bank_info,
-    get_purchases: get_purchases
+    get_purchases: get_purchases,
+    get_payments: get_payments
 };

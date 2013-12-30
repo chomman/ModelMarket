@@ -28,3 +28,32 @@ mixin purchase_link_row(description, downloadurl, date, amount)
                 | #{amount}
             th 
                 a(href="#{downloadurl}") download
+
+mixin payment_header()
+    thead
+        tr
+            th Model
+            th Bought By
+            th Date of Purchase
+            th For the Amount
+            th Your Cut
+            th Date of Transfer
+
+mixin payment_row(t)
+    tbody
+        if (t.money_transfered)
+            tr(style="background-color:#DDDDDD;")
+        else
+            tr(style="background-color:#99CCFF;")
+                th 
+                    | #{t.description}
+                th
+                    | #{t.purchase_username}
+                th 
+                    | #{t.date_recieved}
+                th 
+                    | #{t.model_cost}
+                th 
+                    | #{t.after_stripe_fees}
+                th 
+                    | #{t.data_transfered}
