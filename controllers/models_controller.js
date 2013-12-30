@@ -284,14 +284,16 @@ function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey(global.keys.stripeSecretTest);
     var res_message;
-    var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
-    var charge = stripe.charges.create({
+    console.log("Price :" + amount);
+    if(amount != 0){
+        var stripeToken = req.body.stripeToken;
+        var charge = stripe.charges.create({
         amount: amount, // amount in cents, again
         currency: "usd",
         card: stripeToken,
         description: "description"
-    }, function(err, charge) {
+        }, function(err, charge) {
             if (err && err.type === 'StripeCardError') {
                 console.log("ERROR");
                 console.log(err);
@@ -301,6 +303,23 @@ function post_buy(req, res){
             }
         }
     );
+    }
+    else{
+        Model3d.find_by_id(req.params.id, function(err, obj){
+            if(err){
+                console.log(err); 
+                res.send('something_broke :(');
+            }
+            else{
+                res.render('models/buy', {name: obj.name,
+                                        description: obj.description,
+                                        price: obj.price,
+                                        id: obj._id,
+                                        message: res_message});
+            }
+        });
+    }
+    
 }
 
 // models/uploads/:id
