@@ -280,12 +280,17 @@ function charge_captured(charge, res_message, req, res, amount) {
     }
 }
 
+/* Function to buy a model.
+*/
 function post_buy(req, res){
     console.log("Reached here");
     stripe.setApiKey(global.keys.stripeSecretTest);
     var res_message;
     var amount = req.body.amount;
     console.log("Price :" + amount);
+
+    // If model price is 0 skip payment process, find the model by ID and render it.
+
     if(amount != 0){
         var stripeToken = req.body.stripeToken;
         var charge = stripe.charges.create({
