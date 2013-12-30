@@ -262,9 +262,6 @@ function post_buy(req, res){
     }
     stripe.setApiKey(global.keys.stripeSecretTest);
 
-    console.log("Purchase request:");
-    console.log(req.params);
-    console.log(req.body);
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
     var transaction = new Transaction.model({model_id: req.params.id
@@ -277,7 +274,6 @@ function post_buy(req, res){
             Model3d.model.findById(transaction.model_id, callback);
         },
         function(model3d, callback){
-            console.log("found model...");
             model_ref = model3d;
             transaction.model_owner_username = model3d.creator;
             transaction.model_cost = model3d.price;
@@ -286,17 +282,12 @@ function post_buy(req, res){
             stripe_make_charge(amount, "usd", stripeToken, description, callback);
         },
         function(charge, callback){
-            console.log("charge successful");
-            //console.log(charge)
             transaction.date_recieved = Date.now();
             transaction.money_recieved = true;
             transaction.save(callback);
             //User.find_by_name(Auth.current_user(req), callback);
         },
         function(transaction, num, callback){
-            console.log("transaction saved!");
-            console.log(transaction);
-
             callback(null); //no error
         }
     ],  function (err, result) {
