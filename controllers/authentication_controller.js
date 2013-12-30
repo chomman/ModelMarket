@@ -18,24 +18,30 @@ passport.deserializeUser(User.deserializeUser());
 
 // /login GET
 function get_login(req, res) {
+    var backURL = req.header('Referer') || '/';
     //prevent people logging in again
     if(req.session.passport.user){
-        res.redirect('/');
+        res.redirect(backURL);
         return;
     }
     res.render('authentication/login', {passport : req.session.passport, selected: "login"});
+    req.session.return_to = backURL; //inject previous page into the user session
 }
 
 // /login POST
 function post_login(req, res, serr) {
     /*jshint unused: vars */
-    res.redirect('/');
+    //res.redirect(req.session.backURL);
 }
 
 // /logout GET
 function logout(req, res) {
     req.logout();
-    res.redirect('/');
+    res.redirect('back');
+}
+
+function redirect_login(req, res){
+    res.redirect("/login");
 }
 module.exports = {
     get_login: get_login,
@@ -43,5 +49,9 @@ module.exports = {
     get_logout: logout,
     current_user: function(req) {
         return req.session.passport.user || null;
+    },
+    back: function(req, res){
+        console.log("going back!");
+        res.redirect(req.session.return_to || "/");
     }
 };

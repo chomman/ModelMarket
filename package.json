@@ -12,6 +12,7 @@
     "passport-local-mongoose": "",
     "async": "",
     "stripe": "",
-    "gridfs-stream": ""
+    "gridfs-stream": "",
+    "connect-ensure-login": ""
   }
 }

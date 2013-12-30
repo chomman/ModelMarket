@@ -1,6 +1,7 @@
 /*jslint node: true */
 "use strict";
 var passport = require('passport');
+var cel = require('connect-ensure-login');
 //#express
 var express = require('express');
 var app = express();
@@ -79,20 +80,21 @@ app.get('/search', navigation_controller.get_search);
 app.post('/search', navigation_controller.post_search);
 
 
-app.get('/models/new', models_controller.get_new);
-app.post('/models/new', models_controller.post_new);
+app.get('/models/new', cel.ensureLoggedIn('/login'), models_controller.get_new);
+app.post('/models/new', cel.ensureLoggedIn('/login'), models_controller.post_new);
 app.get('/models/:id', models_controller.show);
-app.del('/models/:id', models_controller.del);
-app.get('/models/:id/edit', models_controller.get_edit);
-app.get('/models/:id/buy',  models_controller.get_buy);
+app.del('/models/:id', cel.ensureLoggedIn('/login'), models_controller.del);
+app.get('/models/:id/edit', cel.ensureLoggedIn('/login'), models_controller.get_edit);
+app.get('/models/:id/buy',  cel.ensureLoggedIn('/login'), models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
-app.post('/models/:id/star', models_controller.post_star);
-app.post('/models/:id/unstar', models_controller.post_unstar);
+app.post('/models/:id/star', cel.ensureLoggedIn('/login'), models_controller.post_star);
+app.post('/models/:id/unstar', cel.ensureLoggedIn('/login'), models_controller.post_unstar);
 app.get('/models/uploads/:id', models_controller.get_file);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
-app.post('/login', passport.authenticate('local'), authentication_controller.post_login);
+app.post('/login', passport.authenticate('local', { successReturnToOrRedirect: '/beforelogin', failureRedirect: '/login' }), authentication_controller.post_login);
+app.get('/beforelogin', authentication_controller.back)
 
 app.get('/users/register', users_controller.get_register);
 app.post('/users/register', users_controller.post_register);
@@ -101,9 +103,9 @@ app.get('/users/:username/edit', users_controller.get_edit);
 app.put('/users/:username/edit', users_controller.put_edit);
 app.post('/users/:username/upload_image', users_controller.post_upload_image);
 app.get('/users/:username/image', users_controller.get_image);
-app.del('/users/:username', users_controller.del);
-app.get('/users/:username/bank_info', users_controller.get_bank_info);
-app.post('/users/:username/bank_info', users_controller.post_bank_info);
+app.del('/users/:username', cel.ensureLoggedIn('/login'), users_controller.del);
+app.get('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_controller.get_bank_info);
+app.post('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_controller.post_bank_info);
 
 console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);

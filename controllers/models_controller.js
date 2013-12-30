@@ -98,6 +98,11 @@ function get_show(req, res){
 
 // models/:id/edit GET
 function get_model_edit(req, res){
+    console.log("current user: " + Auth.current_user(req));
+    if(!Auth.current_user(req)){
+        res.redirect("/login");
+        return;
+    }
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
         if(err){
             console.log(err);
