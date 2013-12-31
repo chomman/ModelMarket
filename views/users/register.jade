@@ -1,6 +1,7 @@
-extends ../layout
-
+extend ../layout
 block content
+    p
+        | #{message}
     div.register-form
         form.pure-form.pure-form-aligned(action="/users/register",method="post")
             div.pure-control-group
