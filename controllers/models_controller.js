@@ -289,7 +289,7 @@ function post_buy(req, res){
     var amount = req.body.amount;
     console.log("Price :" + amount);
 
-    // If model price is 0 skip payment process, find the model by ID and render it.
+    // If model price is 0 skip payment process, find the model by ID and render it for download.
 
     if(amount != 0){
         var stripeToken = req.body.stripeToken;
