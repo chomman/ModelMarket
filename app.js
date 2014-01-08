@@ -79,7 +79,6 @@ app.get('/about', navigation_controller.get_about);
 app.get('/search', navigation_controller.get_search);
 app.post('/search', navigation_controller.post_search);
 
-
 app.get('/models/new', cel.ensureLoggedIn('/login'), models_controller.get_new);
 app.post('/models/new', cel.ensureLoggedIn('/login'), models_controller.post_new);
 app.get('/models/:id', models_controller.show);
@@ -93,8 +92,8 @@ app.get('/models/uploads/:id', models_controller.get_file);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
-app.post('/login', passport.authenticate('local', { successReturnToOrRedirect: '/beforelogin', failureRedirect: '/login' }), authentication_controller.post_login);
-app.get('/beforelogin', authentication_controller.back)
+app.post('/login', passport.authenticate('local', { successReturnToOrRedirect: '/beforelogin',failureRedirect: '/login' }));//, authentication_controller.post_login);
+app.get('/beforelogin', authentication_controller.back);
 
 app.get('/users/register', users_controller.get_register);
 app.post('/users/register', users_controller.post_register);
@@ -106,6 +105,8 @@ app.get('/users/:username/image', users_controller.get_image);
 app.del('/users/:username', cel.ensureLoggedIn('/login'), users_controller.del);
 app.get('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_controller.get_bank_info);
 app.post('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_controller.post_bank_info);
+app.get('/users/:username/purchases', cel.ensureLoggedIn('/login'), users_controller.get_purchases);
+app.get('/users/:username/payments', cel.ensureLoggedIn('/login'), users_controller.get_payments);
 
 console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);

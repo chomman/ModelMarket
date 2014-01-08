@@ -1,0 +1,20 @@
+extends ../layout
+include ../mixins
+block content
+    
+    p 
+        | In order to reduce the cost of transfering funds we do payouts every $30 USD that you make.
+        | This alows us to save money on the number of transfers we make and give you a bigger cut.
+        | If you have any issue with payments please contact us at payments@moderu.com
+        
+    p(style="color:#99CCFF;") Unpayed
+    p(style="color:#DDDDDD;") Transfered
+    div
+        h2 Models you sold:
+        if transactions
+            table.pure-table.pure-table-bordered
+                mixin payment_header()
+                -each t in transactions
+                    mixin payment_row(t)
+        else
+            | You havent made any sales yet.

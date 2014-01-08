@@ -6,6 +6,7 @@ var Model3d = require('./../models/model3d_schema');
 var File = require('./../models/file_schema'); 
 var User = require('./../models/user_schema'); 
 var Auth = require('./authentication_controller');
+var Transaction = require('./../models/transaction_schema');
 
 var Grid = require("gridfs-stream");
 var mongoose = require('mongoose');
@@ -20,6 +21,7 @@ var stripe = require("stripe")(
 );
 
 var async = require('async');
+var q = require('q');
 
 // models/new GET
 function get_new(req, res){
@@ -44,6 +46,16 @@ function post_new(req, res){
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
     /*  This shit should probably be done in the file_schema module */
+
+    /*q.ncall(File.put_file_into_database, fs, 'test.txt')
+    .then(function(gridfs_id){
+            new_model3d.grid_files.push(gridfs_id);
+            new_model3d.grid_display = gridfs_id;
+            return new_model3d;
+            new_model3d.save(function(err){
+                res.redirect("/");
+            });
+    });*/
 
     File.put_file_into_database(req.files.model.path, function(err, gridfs_id){
         if(err)
@@ -200,107 +212,104 @@ function toggle_star(req, res, increase){
     });
 }
 
-
+//GET models/:id/buy
 function get_buy(req, res){
-    Model3d.find_by_id(req.params.id, function(err, obj){
-        if(err) {
-            res.render('something_broke :(');
-        }
-        else {
-            res.render('models/buy', {name: obj.name, description: obj.description, price: obj.price, id: obj._id});
-        }
-    });
-    //res.render('models/buy', {});
-}
-
-function create_transfer(user_obj, amount) {
-    var recipient = stripe.recipients.retrieve(user_obj.recipientid, function(err, recipient){
-        if(err){
-            console.log(err);
-        }else{
-            stripe.transfers.create({
-                    amount: amount,
-                    currency: "usd",
-                    /*jshint sub: true */
-                    recipient: recipient["id"],
-                    description: "Transfer for test@example.com"
-                }, 
-                function(err, transfer) {
-                    if(err){
-                        console.log(err);
-                    }else{
-                        console.log(transfer);
-                    }
-                });
-        }
-    });
-}
-
-function transfer_money_to_creator(err, user_obj, amount) {
-    if(err){
-        console.log(err);
+    var model_id = req.params.id;
+    if(!Auth.current_user(req)){
+        res.status(401).redirect("/login");
+        return;
     }
-    else{
-        if(!user_obj.recipientid){
-            console.log("recipient hasnt yet setup their banking information. We should store this transaction and pay them in the future.");
-        }
-        else {
-            create_transfer(user_obj, amount);
-        }
-    }
-}
+    async.parallel([
 
-function charge_captured(charge, res_message, req, res, amount) {
-    /*jshint sub: true */
-    if(charge["captured"]) {
-        res_message = "Your payment has been successful.";
-        console.log("Made charge");
-        console.log(req.params.id);
-        Model3d.find_by_id(req.params.id, function(err, obj){
+        function(callback){
+            Model3d.find_by_id(model_id, callback);
+        },
+        function(callback){
+            Transaction.find_transaction_for_user_model(Auth.current_user(req), model_id, callback);
+        }],
+
+        function(err, results){
+            console.log(results);
             if(err){
-                console.log(err); 
-                res.send('something_broke :(');
+                console.error(err);
+                res.status(501).send("Something went wrong :(");
+                return;
             }
-            else{
-                var creator = obj.creator;
-                User.find_by_name(creator, function(err, user_obj){
-                    transfer_money_to_creator(err, user_obj, amount);
-                });
-                res.render('models/buy', {name: obj.name,
-                                        description: obj.description,
-                                        price: obj.price,
-                                        id: obj._id,
-                                        message: res_message});
+            var modelobj = results[0];
+            var transaction = results[1];
+            if(!modelobj || !transaction){
+                console.error("download link failed");
+                console.error(err);
+                res.status(501).send("Something went wrong :(");
+                return;
             }
-        });
-    }
-    else{
-        res_message = "Your payment has been unsuccessful.";
-        console.log("No charge");
-    }
-}
-
-function post_buy(req, res){
-    console.log("Reached here");
-    stripe.setApiKey(global.keys.stripeSecretTest);
-    var res_message;
-    var stripeToken = req.body.stripeToken;
-    var amount = req.body.amount;
-    var charge = stripe.charges.create({
-        amount: amount, // amount in cents, again
-        currency: "usd",
-        card: stripeToken,
-        description: "description"
-    }, function(err, charge) {
-            if (err && err.type === 'StripeCardError') {
-                console.log("ERROR");
-                console.log(err);
-            }
-            else {
-                charge_captured(charge, res_message, req, res, amount);
-            }
+            res.render("models/buy", {transaction: transaction, model: modelobj});
         }
     );
+}
+
+
+function stripe_make_charge(amount, currency, card_token, description, callback){
+    stripe.charges.create({
+        amount: amount, // amount in cents, again
+        currency: currency,
+        card: card_token,
+        description: description
+        }, callback);
+}
+
+// POST models/:id/buy 
+// sent from the stripe front end module
+function post_buy(req, res){
+    if(!Auth.current_user(req)){
+        res.send("need to login to purchase models!");
+        return;
+    }
+    stripe.setApiKey(global.keys.stripeSecretTest);
+
+    var stripeToken = req.body.stripeToken;
+    var amount = req.body.amount;
+    var transaction = new Transaction.model({model_id: req.params.id
+                                            ,purchase_username: Auth.current_user(req)});
+    var model_ref;
+
+    //does each of these steps async and passes the result to the next step
+    async.waterfall([
+        function(callback){
+            Model3d.model.findById(transaction.model_id, callback);
+        },
+        function(model3d, callback){
+            model_ref = model3d;
+            transaction.model_owner_username = model3d.creator;
+            transaction.model_cost = model3d.price;
+            var description = model3d.name + " by " + model3d.creator;
+            transaction.description = description;
+            stripe_make_charge(amount, "usd", stripeToken, description, callback);
+        },
+        function(charge, callback){
+            transaction.date_recieved = Date.now();
+            transaction.money_recieved = true;
+            transaction.save(callback);
+            //User.find_by_name(Auth.current_user(req), callback);
+        },
+        function(transaction, num, callback){
+            callback(null); //no error
+        }
+    ],  function (err, result) {
+        if(err){
+            // if any errors occured throughout this proccess this function will be called
+            console.error("an error occured during the transaction process");
+            console.error(err);
+            transaction.aborted = true;
+            transaction.save();
+        }else{
+            //check if the model owner has a high enough balance to be payed
+            User.resolve_transfers_for_username(transaction.model_owner_username);
+            //render the download page to the user who purchased the model
+            res.redirect("/models/"+model_ref._id+"/buy");
+
+        }
+    });
 }
 
 // models/uploads/:id

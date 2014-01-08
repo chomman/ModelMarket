@@ -18,6 +18,7 @@ passport.deserializeUser(User.deserializeUser());
 
 // /login GET
 function get_login(req, res) {
+    console.log("setting back url");
     var backURL = req.header('Referer') || '/';
     //prevent people logging in again
     if(req.session.passport.user){
@@ -32,6 +33,7 @@ function get_login(req, res) {
 function post_login(req, res, serr) {
     /*jshint unused: vars */
     //res.redirect(req.session.backURL);
+    console.log("post_login, what?");
 }
 
 // /logout GET
@@ -40,9 +42,6 @@ function logout(req, res) {
     res.redirect('back');
 }
 
-function redirect_login(req, res){
-    res.redirect("/login");
-}
 module.exports = {
     get_login: get_login,
     post_login: post_login, 

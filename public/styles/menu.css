@@ -299,3 +299,11 @@ a:hover{
     opacity: 0;
     filter: alpha(opacity=0);
     }
+
+.mm-profile-button-row{
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.mm-button-row {
+    margin-right: 10px;
+}
