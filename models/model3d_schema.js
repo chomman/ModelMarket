@@ -1,6 +1,7 @@
 /*jslint node: true */
 "use strict";
 var mongoose = require('mongoose');
+var Transaction = require('./transaction_schema');
 
 var modelSchema = new mongoose.Schema({
     name: {
@@ -60,6 +61,17 @@ module.exports.find_by_id = function(id, callback){
         }
     });
 };
+
+module.exports.was_purchased_by_username = function(id, username, callback){
+    Transaction.find_transaction_for_user_model(username, id, function(err, transaction){
+        if(transaction){
+            callback(true);
+        }
+        else{
+            callback(false);
+        }
+    });
+}
 
 module.exports.find_by_string = (function(query, callback) {
     var re = new RegExp(query, "i");

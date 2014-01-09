@@ -18,7 +18,8 @@ var stripe = require("stripe")(
 
 // users/register GET
 function  get_register(req, res) {
-    res.render('users/register', { });
+    var res_message = "";
+    res.render('users/register', {message: res_message});
 }
 
 // users/register POST
@@ -39,7 +40,8 @@ function post_register(req, res) {
             /*jshint unused: vars */
             if (err) 
             {
-                return res.render('users/register', { });
+                var res_message = "Please pick a new username. This one already exists.";
+                return res.render('users/register', {message: res_message});
             }
             res.redirect('/');
         });

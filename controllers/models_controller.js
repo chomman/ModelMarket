@@ -237,9 +237,10 @@ function get_buy(req, res){
             }
             var modelobj = results[0];
             var transaction = results[1];
+            console.log(results);
             if(!modelobj || !transaction){
                 console.error("download link failed");
-                console.error(err);
+                console.log(err);
                 res.status(501).send("Something went wrong :(");
                 return;
             }
@@ -248,8 +249,8 @@ function get_buy(req, res){
     );
 }
 
-
 function stripe_make_charge(amount, currency, card_token, description, callback){
+    stripe.setApiKey(global.keys.stripeSecretTest);
     stripe.charges.create({
         amount: amount, // amount in cents, again
         currency: currency,
@@ -260,12 +261,12 @@ function stripe_make_charge(amount, currency, card_token, description, callback)
 
 // POST models/:id/buy 
 // sent from the stripe front end module
+
 function post_buy(req, res){
     if(!Auth.current_user(req)){
         res.send("need to login to purchase models!");
         return;
     }
-    stripe.setApiKey(global.keys.stripeSecretTest);
 
     var stripeToken = req.body.stripeToken;
     var amount = req.body.amount;
@@ -279,24 +280,30 @@ function post_buy(req, res){
             Model3d.model.findById(transaction.model_id, callback);
         },
         function(model3d, callback){
+
             model_ref = model3d;
             transaction.model_owner_username = model3d.creator;
             transaction.model_cost = model3d.price;
             var description = model3d.name + " by " + model3d.creator;
             transaction.description = description;
-            stripe_make_charge(amount, "usd", stripeToken, description, callback);
+            if(model3d.price == 0){
+                //skips the stripe charge 
+                callback(null, false);
+            }else{
+                stripe_make_charge(amount, "usd", stripeToken, description, callback);
+            }
         },
         function(charge, callback){
             transaction.date_recieved = Date.now();
-            transaction.money_recieved = true;
+            transaction.money_recieved = charge ? true : false;
             transaction.save(callback);
-            //User.find_by_name(Auth.current_user(req), callback);
         },
         function(transaction, num, callback){
             callback(null); //no error
         }
     ],  function (err, result) {
         if(err){
+
             // if any errors occured throughout this proccess this function will be called
             console.error("an error occured during the transaction process");
             console.error(err);
@@ -307,13 +314,27 @@ function post_buy(req, res){
             User.resolve_transfers_for_username(transaction.model_owner_username);
             //render the download page to the user who purchased the model
             res.redirect("/models/"+model_ref._id+"/buy");
-
         }
+    });
+
+}
+
+
+// models/:id/downloads
+function get_downloads(req, res){
+    var current_user = Auth.current_user(req);
+    Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        if(Model3d.was_purchased_by_username(model_obj._id, current_user, function(purchased){
+            if(purchased){
+                req.send("yo");
+            }
+        }));
     });
 }
 
 // models/uploads/:id
 function get_file(req, res) {
+    var current_user = Auth.current_user(req);
     var gridfs = Grid(conn.db);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
         if(err || !model_obj){
@@ -321,12 +342,29 @@ function get_file(req, res) {
             console.log(err);
             return;
         }
-        var readstream = gridfs.createReadStream({_id : model_obj.grid_display});
-        console.log("readstream in models/uploads :");
-        console.log(readstream);
-        res.header('Content-Type', 'plain/text');
-        readstream.pipe(res);
+        if(model_obj.price == 0){
+            pipe_file_to_stream(model_obj.grid_display, res);
+        }
+        else{
+            //validate that the user bought this model at some point, then send
+            Transaction.find_transaction_for_user_model(current_user, model_obj._id, function(err, transaction){
+                if(transaction){
+                    pipe_file_to_stream(model_obj.grid_display, res);
+                }
+            })
+        }
     });
+}
+
+
+
+// pipes a grid file to the specified output stream
+function pipe_file_to_stream(grid_id, res){
+    var readstream = gridfs.createReadStream({_id : grid_id });
+    console.log("readstream in models/uploads :");
+    console.log(readstream);
+    res.header('Content-Type', 'plain/text');
+    readstream.pipe(res);
 }
 
 module.exports = {
