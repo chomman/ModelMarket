@@ -284,6 +284,20 @@ a:hover{
 .pure-button-error {
     background: rgb(202, 60, 60); /* this is a maroon */
 }
+.pure-button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+.pure-button-success {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: rgb(28, 184, 65); /* this is a green */
+}
+.pure-button-small {
+    font-size: 85%;
+}
 
 .circular {
     width: 100px;
@@ -306,4 +320,23 @@ a:hover{
 }
 .mm-button-row {
     margin-right: 10px;
+}
+.upload_instructions {
+    margin-bottom: 10px;
+}
+
+.upload-asset-container {
+    padding-bottom: 10px;
+}
+.upload-asset-element {
+    height: 50px;
+    border-style: solid;
+    border-color: grey;
+    border-width: 1px;
+
+    background-color:  #EFEFEF;
+}
+.upload-asset-inline {
+    float: left;
+    padding: 10px;
 }

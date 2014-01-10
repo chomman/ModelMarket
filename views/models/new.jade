@@ -1,19 +1,44 @@
 extend ../layout
 block content
-    p
-        | Please fill out the following fields before uploading your model
-    div.register-form
-        form.pure-form.pure-form-aligned(action='new',method='post', enctype="multipart/form-data", class="pure-form")
+    script(src="/vendor/jquery-2.js")
+    script(src="/frontend/upload_page.js")
+    h2 Please fill out the following fields to list your model:
+    div
+        form.pure-form.pure-form-stacked(action='new',method='post', enctype="multipart/form-data", class="pure-form")
             div.pure-control-group(data-role='fieldcontain')
                 label(for='name') Title: 
                 input(id='title',type='text',value='',placeholder='My Sexy Model', name="name", autofocus)
             div.pure-control-group(data-role='fieldcontain')
-                label(for='name') Price: $ 
+                label(for='name') Price: List the desire price for your model in USD. 0 will be interpreted as free
                 input(id='title',type='text',value='',placeholder='0.00', name="price")
             div.pure-control-group(data-role='fieldcontain')
                 label(for='description') Description: 
                 input(id='description',type='text',value='',placeholder='', name='description')
+            
+            h3 Display Model
+            div.upload_instructions
+                | Choose a file to be displayed to the user. Moderu Currently accpets the following formats: *.OBJ (wavefront).
+                | See 
+                a(href="someinstructions.com") instructions
+                |  for outputing this format
+
             div.pure-control-group(data-role='fieldcontain')
-                label(for='upload') Model: 
-                input(id="upload", type="file", name="model")
+                label(for='display_model_id') Model: (<50 MB please!)
+                input(id="display_model_id", type="file", name="model")
+
+            div.pure-control-group(data-role='fieldcontain')
+                label(for='display_texture_id') Texture Asset: 
+                input(id="display_texture_id", type="file", name="model2")
+            
+            h3 Additional Assets
+            div.upload_instructions
+                | In addition to the display model, you may want upload other file formats that other users will be able to download when they purchase the model.
+
+            div.upload-asset-container
+                div(id="upload_assets")
+            button.pure-button.pure-button-success.pure-button-small(id="add_asset") Add +
+
+
+
+            p
                 input(type='submit', class="pure-button pure-button-primary",value='Submit',data-transition='fade', data-theme='c')

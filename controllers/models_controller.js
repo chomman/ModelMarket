@@ -32,6 +32,7 @@ function get_new(req, res){
     }
 }
 
+
 // models/new POST
 function post_new(req, res){
     console.log(req.body);
