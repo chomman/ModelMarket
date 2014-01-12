@@ -14,12 +14,19 @@ conn.on('error', console.error.bind(console, 'connection error:'));
 // This class handles all interaction with files in the databse
 */
 
-module.exports.put_file_into_database = function(locationOnDisk, callback) {
+module.exports.put_file_into_database = function(file, callback) {
     var gridfs = Grid(conn.db);
    
-    var writeStream = gridfs.createWriteStream({ filename: locationOnDisk });
+    var meta_data = {
+        filename: file.originalFilename,
+        upload_date: new Date(),
+        file_description: file.description,
+        size: file.size
+    }
+
+    var writeStream = gridfs.createWriteStream(meta_data);
     console.log("reached putFileIntoDatabase");
-    fs.createReadStream(locationOnDisk).pipe(writeStream);
+    fs.createReadStream(file.path).pipe(writeStream);
 
     writeStream.on("close", function (gridfile) {
         console.log("file : " + gridfile);

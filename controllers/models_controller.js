@@ -21,7 +21,6 @@ var stripe = require("stripe")(
 );
 
 var async = require('async');
-var q = require('q');
 
 // models/new GET
 function get_new(req, res){
@@ -32,11 +31,40 @@ function get_new(req, res){
     }
 }
 
+// make sure that all the required inputs were suplied by the user
+function validate_post_new_form(req){
+    if(!req.body.name) return false;
+    if(!req.body.price) return false;
+    if(!req.body.description) return false;
+    if(!req.files.display_model) return false;
+
+    return true;
+}
+
+function get_asset_description_from_form(req, asset_name){
+    console.log("getting description for asset: "+ asset_name);
+    if(asset_name == "display_model") return "Display model";
+    if(asset_name == "display_texture") return "Display texture";
+
+    var number = new RegExp(/(\d+)/).exec(asset_name)[0];
+    console.log(number);
+    var description_field = "description_asset" + number;
+    var drop_field = "drop_asset"+number;
+
+    return req.body[description_field] + "(" + req.body[drop_field] + ")";
+}
 
 // models/new POST
 function post_new(req, res){
+    //TODO: Authenticate
+    if( !validate_post_new_form(req) ){
+        req.redirect('back');
+        console.log("invalid inputs!");
+        return;
+    }
+    console.log("new model posted");
     console.log(req.body);
-    console.log(req.files.model.path);
+    console.log(req.files);
     console.log(Auth.current_user(req));
 
     var new_model3d = new Model3d.model({name : req.body.name || "undefined",
@@ -46,38 +74,45 @@ function post_new(req, res){
                                         });
     console.log("price : $" + new_model3d.price + " " + parseFloat(req.body.price));
     console.log("user: " + Auth.current_user(req));
-    /*  This shit should probably be done in the file_schema module */
 
-    /*q.ncall(File.put_file_into_database, fs, 'test.txt')
-    .then(function(gridfs_id){
-            new_model3d.grid_files.push(gridfs_id);
-            new_model3d.grid_display = gridfs_id;
-            return new_model3d;
-            new_model3d.save(function(err){
-                res.redirect("/");
-            });
-    });*/
+    var files = req.files;
 
-    File.put_file_into_database(req.files.model.path, function(err, gridfs_id){
-        if(err)
-        {
-            console.log("There was an error moving the file to the database");
-            console.log(err);
-            res.redirect("/");
+    var model_display_index;
+    var asset_files = [];
+    for(var f in files){
+        var file = files[f];
+        if(file.size > 0){
+            if(f == "display_model") model_display_index = asset_files.length;
+            var description = get_asset_description_from_form(req, f);
+            console.log(description);
+            //inject description onto object
+            file.description = description;
+            asset_files.push(file);
         }
-        else
-        {
-            new_model3d.grid_files.push(gridfs_id);
-            new_model3d.grid_display = gridfs_id;
+    }
+
+    
+    console.log("saving following files to db");
+
+    async.map(asset_files, File.put_file_into_database, function(err, results){
+        //results contains the gridfs id's of the files
+        if(err){
+            console.log("error saving uploads");
+            res.status(502).redirect("/");
+        }else{
+            console.log("sucessufully uploaded files... saving model");
+            new_model3d.grid_files = results;
+            //TODO: process file @tarun
+            new_model3d.grid_display = results[model_display_index];
+            console.log("grid display file id: " + new_model3d.grid_display);
             new_model3d.save(function(err) {
                 if (err) {
                     console.log(err);
                 }
                 res.redirect("/");
             });
-        } 
+        }
     });
-
 }
 
 // models/:id GET
@@ -336,14 +371,16 @@ function get_downloads(req, res){
 // models/uploads/:id
 function get_file(req, res) {
     var current_user = Auth.current_user(req);
-    var gridfs = Grid(conn.db);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
+        console.log("found model display: " + model_obj.grid_display);
         if(err || !model_obj){
             res.status(404).send();
             console.log(err);
             return;
         }
-        if(model_obj.price == 0){
+        pipe_file_to_stream(model_obj.grid_display, res);
+
+        /*if(model_obj.price == 0){
             pipe_file_to_stream(model_obj.grid_display, res);
         }
         else{
@@ -353,7 +390,7 @@ function get_file(req, res) {
                     pipe_file_to_stream(model_obj.grid_display, res);
                 }
             })
-        }
+        }*/
     });
 }
 
@@ -361,6 +398,8 @@ function get_file(req, res) {
 
 // pipes a grid file to the specified output stream
 function pipe_file_to_stream(grid_id, res){
+    var gridfs = Grid(conn.db);
+
     var readstream = gridfs.createReadStream({_id : grid_id });
     console.log("readstream in models/uploads :");
     console.log(readstream);

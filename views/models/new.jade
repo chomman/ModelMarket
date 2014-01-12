@@ -6,14 +6,14 @@ block content
     div
         form.pure-form.pure-form-stacked(action='new',method='post', enctype="multipart/form-data", class="pure-form")
             div.pure-control-group(data-role='fieldcontain')
-                label(for='name') Title: 
-                input(id='title',type='text',value='',placeholder='My Sexy Model', name="name", autofocus)
+                label(for='name') <b>Title:</b>
+                input(id='title',type='text',value='',placeholder='My Sexy Model', name="name", required, autofocus)
             div.pure-control-group(data-role='fieldcontain')
-                label(for='name') Price: List the desire price for your model in USD. 0 will be interpreted as free
-                input(id='title',type='text',value='',placeholder='0.00', name="price")
+                label(for='name') <b>Price:</b> 0 will be interpreted as free
+                input(id='title',type='number',value='',placeholder='$ USD', name="price", required)
             div.pure-control-group(data-role='fieldcontain')
                 label(for='description') Description: 
-                input(id='description',type='text',value='',placeholder='', name='description')
+                textarea(id='description',type='text',value='',placeholder='', name='description', required)
             
             h3 Display Model
             div.upload_instructions
@@ -23,12 +23,12 @@ block content
                 |  for outputing this format
 
             div.pure-control-group(data-role='fieldcontain')
-                label(for='display_model_id') Model: (<50 MB please!)
-                input(id="display_model_id", type="file", name="model")
+                label(for='display_model') Model: (<50 MB please!)
+                input(id="display_model_id", type="file", name="display_model")
 
             div.pure-control-group(data-role='fieldcontain')
-                label(for='display_texture_id') Texture Asset: 
-                input(id="display_texture_id", type="file", name="model2")
+                label(for='display_texture') Texture Asset: 
+                input(id="display_texture_id", type="file", name="display_texture")
             
             h3 Additional Assets
             div.upload_instructions
@@ -36,7 +36,7 @@ block content
 
             div.upload-asset-container
                 div(id="upload_assets")
-            button.pure-button.pure-button-success.pure-button-small(id="add_asset") Add +
+            button.pure-button.pure-button-small(id="add_asset", type="button") +
 
 
 
