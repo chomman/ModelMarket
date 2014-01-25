@@ -63,37 +63,40 @@ block content
         p 
             | by 
             a(href='/users/#{model.creator}') #{model.creator}
-        form(action="/models/#{model._id}/buy" method="post")
-            div
-                a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
-                script.
-                    $('#buy-btn').click(function(){
-                        if(#{model.price} == 0){
-                            var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
-                            $('form').append($amount).submit();
-                        }
-                        else{
-                            var token = function(res){
-                                var $sToken = $('<input type=hidden name=stripeToken />').val(res.id);
+        if (model.price <= 0)
+            a.pure-button-primary.pure-button(href="/models/#{model._id}/download") Free
+        else
+            form(action="/models/#{model._id}/buy" method="post")
+                div
+                    a(class="pure-button pure-button-primary", href="#", id="buy-btn") Buy Now $#{model.price}
+                    script.
+                        $('#buy-btn').click(function(){
+                            if(#{model.price} == 0){
                                 var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
-                                $('form').append($sToken, $amount).submit();
-                            };
+                                $('form').append($amount).submit();
+                            }
+                            else{
+                                var token = function(res){
+                                    var $sToken = $('<input type=hidden name=stripeToken />').val(res.id);
+                                    var $amount = $('<input type=hidden name=amount />').val(#{model.price*100});
+                                    $('form').append($sToken, $amount).submit();
+                                };
 
-                            StripeCheckout.open({
-                                key:         '#{keys.stripePublishTest}',
-                                address:     false,
-                                amount:      #{model.price*100},
-                                currency:    'usd',
-                                name:        '#{model.name}',
-                                description: 'Download rights',
-                                panelLabel:  'Checkout',
-                                image:       'http://placehold.it/128x128',
-                                token:       token
-                            });
-                        }
-                        
+                                StripeCheckout.open({
+                                    key:         '#{keys.stripePublishTest}',
+                                    address:     false,
+                                    amount:      #{model.price*100},
+                                    currency:    'usd',
+                                    name:        '#{model.name}',
+                                    description: 'Download rights',
+                                    panelLabel:  'Checkout',
+                                    image:       'http://placehold.it/128x128',
+                                    token:       token
+                                });
+                            }
+                            
 
-                        return false;
-                    });
+                            return false;
+                        });
         p
             | views: #{model.views}
