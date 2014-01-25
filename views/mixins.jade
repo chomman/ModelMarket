@@ -57,3 +57,24 @@ mixin payment_row(t)
                     | #{t.after_stripe_fees}
                 th 
                     | #{t.data_transfered}
+
+mixin download_pure_button(url)
+
+
+mixin download_link_header()
+    thead
+        tr
+            th Name
+            th Description
+            th Download Link
+mixin download_link_row(name, description, grid_id)
+    tbody
+        tr
+            th
+                | #{name}
+            th 
+                | #{description}
+            th 
+                    form(method="get", action="/models/uploads/#{grid_id}")
+                        button(class="pure-button pure-button-primary", type="submit")
+                            | Download

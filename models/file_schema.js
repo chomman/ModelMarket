@@ -17,14 +17,18 @@ conn.on('error', console.error.bind(console, 'connection error:'));
 module.exports.put_file_into_database = function(file, callback) {
     var gridfs = Grid(conn.db);
    
-    var meta_data = {
+    var options = {
         filename: file.originalFilename,
-        upload_date: new Date(),
-        file_description: file.description,
-        size: file.size
+        metadata: {
+            file_description: file.description,
+            owner: file.model_id 
+        }
+        
     }
+    console.log("options: ");
+    console.log(options);
 
-    var writeStream = gridfs.createWriteStream(meta_data);
+    var writeStream = gridfs.createWriteStream(options);
     console.log("reached putFileIntoDatabase");
     fs.createReadStream(file.path).pipe(writeStream);
 

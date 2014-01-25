@@ -10,7 +10,7 @@ block content
     include shaders
 
     script.
-        var modelURL = "/models/uploads/" + '#{model._id}';
+        var modelURL = "/models/" + '#{model._id}' + "/display";
         var starred = #{starred};
         var loggedIn = #{logged_in}
         $( document ).ready( function(){

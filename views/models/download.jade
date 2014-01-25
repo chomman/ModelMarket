@@ -1,0 +1,11 @@
+extend ../layout
+include ../mixins
+block content
+    h3 #{model.name}. 
+    p #{model.description}
+    p Download links:
+    div
+        table.pure-table.pure-table-bordered
+            mixin download_link_header()
+            -each f in files
+                    mixin download_link_row(f.filename, f.metadata.file_description, f._id)

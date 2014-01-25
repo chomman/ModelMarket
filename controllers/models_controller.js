@@ -87,6 +87,7 @@ function post_new(req, res){
             console.log(description);
             //inject description onto object
             file.description = description;
+            file.model_id = new_model3d._id;
             asset_files.push(file);
         }
     }
@@ -265,9 +266,10 @@ function get_buy(req, res){
         }],
 
         function(err, results){
+            console.log("got here");
             console.log(results);
             if(err){
-                console.error(err);
+                console.log(err);
                 res.status(501).send("Something went wrong :(");
                 return;
             }
@@ -275,7 +277,7 @@ function get_buy(req, res){
             var transaction = results[1];
             console.log(results);
             if(!modelobj || !transaction){
-                console.error("download link failed");
+                console.log("download link failed");
                 console.log(err);
                 res.status(501).send("Something went wrong :(");
                 return;
@@ -356,20 +358,48 @@ function post_buy(req, res){
 }
 
 
-// models/:id/downloads
+// models/:id/download
 function get_downloads(req, res){
     var current_user = Auth.current_user(req);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
-        if(Model3d.was_purchased_by_username(model_obj._id, current_user, function(purchased){
-            if(purchased){
-                req.send("yo");
-            }
-        }));
+        var model_id = model_obj._id;
+        if(model_obj.price <= 0){
+            render_downloads(res, model_obj);
+        }
+        else{
+            Model3d.was_purchased_by_username(model_id, current_user, function(purchased){
+                if(purchased){
+                    render_downloads(res, model_obj);
+                }else{
+                    res.status(401).send("You have not purchased this model");
+                }
+            });
+        } 
     });
 }
 
+
+// models/:id/download
+function render_downloads (res, model) {
+    var gridfs = Grid(conn.db);
+
+    gridfs.files.find({'metadata.owner':model._id }).toArray(function (err, files) {
+        console.log("-----------------------------------------");
+        console.log(files);
+        res.render("models/download", {files: files, model: model});
+    })
+}
+
+
 // models/uploads/:id
 function get_file(req, res) {
+    var grid_id = req.params.id;
+    pipe_file_to_stream(grid_id, res);
+}
+
+// models/:id/display
+function get_display_model(req, res) {
+
     var current_user = Auth.current_user(req);
     Model3d.find_by_id(req.params.id, function(err, model_obj){ 
         console.log("found model display: " + model_obj.grid_display);
@@ -379,22 +409,8 @@ function get_file(req, res) {
             return;
         }
         pipe_file_to_stream(model_obj.grid_display, res);
-
-        /*if(model_obj.price == 0){
-            pipe_file_to_stream(model_obj.grid_display, res);
-        }
-        else{
-            //validate that the user bought this model at some point, then send
-            Transaction.find_transaction_for_user_model(current_user, model_obj._id, function(err, transaction){
-                if(transaction){
-                    pipe_file_to_stream(model_obj.grid_display, res);
-                }
-            })
-        }*/
     });
 }
-
-
 
 // pipes a grid file to the specified output stream
 function pipe_file_to_stream(grid_id, res){
@@ -402,9 +418,10 @@ function pipe_file_to_stream(grid_id, res){
 
     var readstream = gridfs.createReadStream({_id : grid_id });
     console.log("readstream in models/uploads :");
-    console.log(readstream);
     res.header('Content-Type', 'plain/text');
     readstream.pipe(res);
+
+
 }
 
 module.exports = {
@@ -413,8 +430,10 @@ module.exports = {
     show: get_show,
     del: delete_model,
     get_edit: get_model_edit,
+    get_downloads: get_downloads,
     get_buy: get_buy,
     get_file: get_file,
+    get_display_model: get_display_model,
     post_buy: post_buy,
     post_star: post_star,
     post_unstar: post_unstar

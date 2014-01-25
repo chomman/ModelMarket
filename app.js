@@ -84,11 +84,13 @@ app.post('/models/new', cel.ensureLoggedIn('/login'), models_controller.post_new
 app.get('/models/:id', models_controller.show);
 app.del('/models/:id', cel.ensureLoggedIn('/login'), models_controller.del);
 app.get('/models/:id/edit', cel.ensureLoggedIn('/login'), models_controller.get_edit);
+app.get('/models/:id/download', models_controller.get_downloads);
 app.get('/models/:id/buy',  cel.ensureLoggedIn('/login'), models_controller.get_buy);
 app.post('/models/:id/buy',  models_controller.post_buy);
 app.post('/models/:id/star', cel.ensureLoggedIn('/login'), models_controller.post_star);
 app.post('/models/:id/unstar', cel.ensureLoggedIn('/login'), models_controller.post_unstar);
 app.get('/models/uploads/:id', models_controller.get_file);
+app.get('/models/:id/display', models_controller.get_display_model);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
