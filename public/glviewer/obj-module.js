@@ -488,23 +488,6 @@ function finishedModelDownload(data){
 function getModelFromFile(modelURL){
     var loader = $('#loaderbar').width(1);
     var canvas = $('#my-canvas');
-    (function addXhrProgressEvent($) {
-        var originalXhr = $.ajaxSettings.xhr;
-        $.ajaxSetup({
-            progress: function() { console.log("standard progress callback"); },
-            xhr: function() {
-                var req = originalXhr(), that = this;
-                if (req) {
-                    if (typeof req.addEventListener == "function") {
-                        req.addEventListener("progress", function(evt) {
-                            that.progress(evt);
-                        },false);
-                    }
-                }
-                return req;
-            }
-        });
-    })($);
     console.log("getting file from url: " + modelURL);
     $.ajax({
         url: modelURL,
@@ -517,20 +500,22 @@ function getModelFromFile(modelURL){
                 opacity: '0'
                 }, 500);
             finishedModelDownload(data.responseText);
-
+            console.log("here?");
         },
-        progress: function(evt) {
-            if (evt.lengthComputable) {
-                loader.width(canvas.width()*evt.loaded / evt.total );
-            }
-            else {
-                console.log("Length not computable.");
-            }
+        xhr: function(){
+            var xhr = new window.XMLHttpRequest();
+            xhr.addEventListener("progress", function(evt){
+                if (evt.lengthComputable) {  
+                    var percentComplete = evt.loaded / evt.total;
+                    console.log(percentComplete+"%");
+                    loader.width(canvas.width()*percentComplete);
+                }
+            }, false);
+            return xhr;
         }
-     
     });
-    //$.get(modelURL, finishedModelDownload, 'text')
 }
+
 
 function face(_v1, _v2, _v3){
     this.v1 = parseInt(_v1);

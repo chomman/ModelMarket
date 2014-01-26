@@ -389,7 +389,7 @@ function render_downloads (res, model) {
         console.log("-----------------------------------------");
         console.log(files);
         res.render("models/download", {files: files, model: model});
-    })
+    });
 }
 
 
@@ -410,7 +410,12 @@ function get_display_model(req, res) {
             console.log(err);
             return;
         }
-        pipe_file_to_stream(model_obj.grid_display, res);
+        var gridfs = Grid(conn.db);
+        gridfs.files.find({'_id': model_obj.grid_display}).toArray(function(err, obj){
+            //we need to set the content length header so that ajax xhr can determine the progress and update the loading bar
+            res.setHeader("Content-Length", obj[0].length);
+            pipe_file_to_stream(model_obj.grid_display, res);
+        });
     });
 }
 
@@ -421,6 +426,8 @@ function pipe_file_to_stream(grid_id, res){
     var readstream = gridfs.createReadStream({_id : grid_id });
     console.log("readstream in models/uploads :");
     console.log(readstream);
+    console.log("-------------------");
+    //res.setHeader("Content-Length", );
     //res.header('Content-Type', 'plain/text');
     readstream.pipe(res);
 }
