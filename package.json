@@ -13,6 +13,7 @@
     "async": "",
     "stripe": "",
     "gridfs-stream": "",
-    "connect-ensure-login": ""
+    "connect-ensure-login": "",
+    "streamifier": ""
   }
 }
