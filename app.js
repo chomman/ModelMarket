@@ -92,7 +92,7 @@ app.post('/models/:id/unstar', cel.ensureLoggedIn('/login'), models_controller.p
 app.get('/models/uploads/:id', models_controller.get_file);
 app.get('/models/:id/display', models_controller.get_display_model);
 app.post('/models/:id/submit_screenshot', models_controller.post_submit_screenshot);
-
+app.get('/models/:id/screenshot.png', models_controller.get_screenshot);
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);

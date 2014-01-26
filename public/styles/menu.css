@@ -335,3 +335,8 @@ a:hover{
     float: left;
     padding: 10px;
 }
+.image-preview-container {
+    visibility: hidden;
+    max-width: 300px;
+
+}

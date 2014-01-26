@@ -1,13 +1,13 @@
-mixin model_link(name, description, views, url)
+mixin model_link(model_obj, name, description, views, url)
     .pure-g-r.model-list(style="margin-bottom:10px")
         .pure-u-1-4(style="max-height:150px")
-            img.model-image(src="http://placehold.it/150x150")
+            img.model-image(src="/models/#{model_obj._id}/screenshot.png")
         .pure-u-3-4(style="max-height:150px")
-            a(href='#{url}')
-                h4 #{name}
-            | #{description}
+            a(href='/models/#{model_obj._id}')
+                h4 #{model_obj.name}
+            | #{model_obj.description}
             p
-                |Views: #{views}
+                |Views: #{model_obj.views}
 
 mixin purchase_link_row_header()
     thead

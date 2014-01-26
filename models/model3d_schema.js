@@ -29,6 +29,10 @@ var modelSchema = new mongoose.Schema({
         type:  mongoose.Schema.Types.ObjectId,
         index: false
     },
+    grid_screenshot: {
+        type:  mongoose.Schema.Types.ObjectId,
+        index: false
+    },
     public: {
         type: Boolean,
         default: false

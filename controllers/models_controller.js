@@ -8,6 +8,8 @@ var User = require('./../models/user_schema');
 var Auth = require('./authentication_controller');
 var Transaction = require('./../models/transaction_schema');
 
+var streamifier = require('streamifier');
+
 var Grid = require("gridfs-stream");
 var mongoose = require('mongoose');
 Grid.mongo = mongoose.mongo;
@@ -110,7 +112,7 @@ function post_new(req, res){
                 if (err) {
                     console.log(err);
                 }
-                res.redirect("/");
+                res.redirect("/models/"+new_model3d._id+"/edit");
             });
         }
     });
@@ -418,10 +420,54 @@ function pipe_file_to_stream(grid_id, res){
 
     var readstream = gridfs.createReadStream({_id : grid_id });
     console.log("readstream in models/uploads :");
-    res.header('Content-Type', 'plain/text');
+    console.log(readstream);
+    //res.header('Content-Type', 'plain/text');
     readstream.pipe(res);
+}
 
+// POST models/:id/submit_screenshot
+function post_submit_screenshot(req, res) {
+    //console.log(req.body);
+    console.log("yoyoyoyoyoyo");
+    save_screenshot_image(req.body.image.replace(/^data:image\/png;base64,/,""), function(err, grid_id){
+        Model3d.find_by_id(req.params.id, function(err, model_obj){
+            model_obj.grid_files.push(grid_id);
+            model_obj.grid_screenshot = grid_id;
+            model_obj.save(function(err){
+                res.status(200).end();
+            });
+        })
+    });
+}
 
+function save_screenshot_image(base64_data, callback) {
+    var img = new Buffer(base64_data, 'base64');
+    var gridfs = Grid(conn.db);
+    var options = {
+        filename: "Screenshot- " + new Date(),
+        metadata: {
+            file_description: "Screenshot"
+        }
+    };
+
+    var writeStream = gridfs.createWriteStream(options);
+    streamifier.createReadStream(img).pipe(writeStream);
+    writeStream.on("close", function (gridfile) {
+        console.log("file : " + gridfile);
+        console.log("write file finished");
+        console.log("gridfile-------------------------------");
+        console.log(gridfile);
+        callback(null, gridfile._id);
+    });
+}
+
+// GET models/:id/screenshot
+function get_screenshot(req, res){
+    var model_id = req.params.id;
+    Model3d.find_by_id(model_id, function(err, model_obj){
+        console.log("screenshot id: " + model_obj.grid_screenshot);
+        pipe_file_to_stream(model_obj.grid_screenshot, res);
+    });
 }
 
 module.exports = {
@@ -436,5 +482,7 @@ module.exports = {
     get_display_model: get_display_model,
     post_buy: post_buy,
     post_star: post_star,
-    post_unstar: post_unstar
+    post_unstar: post_unstar,
+    post_submit_screenshot: post_submit_screenshot,
+    get_screenshot: get_screenshot
 };

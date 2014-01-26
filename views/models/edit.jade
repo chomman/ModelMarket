@@ -26,6 +26,27 @@ block content
                 });
             }
         }
+        var imgData;
+        function screenshot(){
+            imgData = document.getElementById("my-canvas").toDataURL();
+            return imgData;
+        }
+
+        function screenshot_pressed(){
+            $('#img-preview').attr('src', screenshot());
+            $('#preview').css('visibility', 'visible');
+        }
+
+        function screenshot_submit_pressed(){
+            console.log("hello");
+            $.ajax({
+                type: "POST",
+                url: "/models/#{model._id}/submit_screenshot",
+                data: {image: imgData}
+            }).done(function( respond ) {
+                alert(respond);
+            });
+        }
 
     input(class="pure-button pure-button-error", type="button", value="Delete", onclick="delete_pressed()")
     h2 #{model.name}
@@ -40,3 +61,10 @@ block content
             input(id="private", type="radio", name="optionsRadios", value="option1", checked)
                 | Private
             button.pure-button.pure-button-primary(type="submit") Apply
+    div
+        div#preview.image-preview-container(style="visibility:hidden")
+            img#img-preview
+            button.pure-button.pure-button(onclick="screenshot_submit_pressed()") Submit
+
+        div
+            button.pure-button.pure-button-primary(onclick="screenshot_pressed()") Capture Screenshot

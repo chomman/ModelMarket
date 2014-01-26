@@ -199,7 +199,7 @@ function drawScene() {
 function initGL(canvas) {
     try {
         var _canvas = document.getElementById("my-canvas");
-        gl = _canvas.getContext("webgl");
+        gl = _canvas.getContext("webgl", {preserveDrawingBuffer: true});
         console.log("w: " + canvas.width);
         console.log("h: " + canvas.height);
         gl.viewportWidth = canvas.width;
