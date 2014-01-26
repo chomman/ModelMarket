@@ -129,7 +129,9 @@ function post_upload_image(req, res) {
     }
     User.find_by_name(user, function(err, user){
         var temp_path = req.files.profile_picture.path;
-        File.put_file_into_database(temp_path, function(err, gridfs_id){
+        var file = {};
+        file.path = temp_path;
+        File.put_file_into_database(file, function(err, gridfs_id){
             user.imageid = gridfs_id;
             user.save(function(err){
                 if(err){
