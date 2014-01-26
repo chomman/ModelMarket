@@ -13,8 +13,8 @@ block content
     div
     h2 Models by this user:
     -each m in models
-        mixin model_link(m.name, m.description, m.views, "/models/"+m._id)  
+        mixin model_link(m)  
 
     h2 Models Starred by user:
     -each m in starred
-        mixin model_link(m.name, m.description, m.views, "/models/"+m._id)
+        mixin model_link(m)
