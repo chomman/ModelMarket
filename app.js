@@ -91,6 +91,8 @@ app.post('/models/:id/star', cel.ensureLoggedIn('/login'), models_controller.pos
 app.post('/models/:id/unstar', cel.ensureLoggedIn('/login'), models_controller.post_unstar);
 app.get('/models/uploads/:id', models_controller.get_file);
 app.get('/models/:id/display', models_controller.get_display_model);
+app.post('/models/:id/submit_screenshot', models_controller.post_submit_screenshot);
+
 
 app.get('/logout', authentication_controller.get_logout);
 app.get('/login', authentication_controller.get_login);
@@ -109,6 +111,7 @@ app.get('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_contro
 app.post('/users/:username/bank_info', cel.ensureLoggedIn('/login'), users_controller.post_bank_info);
 app.get('/users/:username/purchases', cel.ensureLoggedIn('/login'), users_controller.get_purchases);
 app.get('/users/:username/payments', cel.ensureLoggedIn('/login'), users_controller.get_payments);
+
 
 console.log("running on port: " + (process.env.PORT || 3000));
 app.listen(process.env.PORT || 3000);
