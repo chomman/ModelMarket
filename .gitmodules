@@ -1,0 +1,3 @@
+[submodule "tools/ParseObj"]
+	path = tools/ParseObj
+	url = https://github.com/tadeegan/ParseObj.git
